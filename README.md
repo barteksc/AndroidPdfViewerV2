@@ -18,6 +18,8 @@ currently `OnPageErrorListener` set with `Configurator#onPageError()` is called.
 
 2.8.1 fixes bug with rendering `PDFView` in Android Studio Layout Editor
 
+2.8.2 fixes not loaded pages when using animated `PDFView#jumpTo()`
+
 ## Changes in 2.0 API
 * `Configurator#defaultPage(int)` and `PDFView#jumpTo(int)` now require page index (i.e. starting from 0)
 * `OnPageChangeListener#onPageChanged(int, int)` is called with page index (i.e. starting from 0)
@@ -31,7 +33,7 @@ currently `OnPageErrorListener` set with `Configurator#onPageError()` is called.
 
 Add to _build.gradle_:
 
-`compile 'com.github.barteksc:android-pdf-viewer:2.8.1'`
+`compile 'com.github.barteksc:android-pdf-viewer:2.8.2'`
 
 Library is available in jcenter repository, probably it'll be in Maven Central soon.
 

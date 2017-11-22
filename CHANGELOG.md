@@ -1,3 +1,6 @@
+## 2.8.2 (2017-11-22)
+* Fix not loaded pages when using animated `PDFView#jumpTo()`
+
 ## 2.8.1 (2017-11-11)
 * Fix bug with rendering `PDFView` in Android Studio Layout Editor
 

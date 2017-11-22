@@ -30,7 +30,7 @@ public class Constants {
     public static float PART_SIZE = 256;
 
     /** Number of preloaded rows or columns */
-    public static int PRELOAD_COUNT = 7;
+    public static int PRELOAD_COUNT = 1;
 
     public static class Cache {
 
