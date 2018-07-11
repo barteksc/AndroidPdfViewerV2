@@ -31,12 +31,14 @@ import android.os.AsyncTask;
 import android.os.HandlerThread;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
 import com.github.barteksc.pdfviewer.listener.OnDrawListener;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
+import com.github.barteksc.pdfviewer.listener.OnLongPressListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
@@ -222,6 +224,11 @@ public class PDFView extends RelativeLayout {
      * Call back object to call when the page is scrolled
      */
     private OnPageScrollListener onPageScrollListener;
+
+    /**
+     * Call back object to call when the user does a long tap gesture
+     */
+    private OnLongPressListener onLongPressListener;
 
     /**
      * Call back object to call when the above layer is to drawn
@@ -530,6 +537,15 @@ public class PDFView extends RelativeLayout {
     OnTapListener getOnTapListener() {
         return this.onTapListener;
     }
+
+    private void setOnLongPressListener(OnLongPressListener onLongPressListener) {
+        this.onLongPressListener = onLongPressListener;
+    }
+
+    OnLongPressListener getOnLongPressListener() {
+        return this.onLongPressListener;
+    }
+
 
     private void setOnDrawListener(OnDrawListener onDrawListener) {
         this.onDrawListener = onDrawListener;
@@ -1399,6 +1415,10 @@ public class PDFView extends RelativeLayout {
         return new Configurator(new InputStreamSource(stream));
     }
 
+    void onLongPress(MotionEvent e){
+
+    }
+
     /**
      * Use custom source as pdf source
      */
@@ -1425,6 +1445,8 @@ public class PDFView extends RelativeLayout {
         private OnLoadCompleteListener onLoadCompleteListener;
 
         private OnErrorListener onErrorListener;
+
+        private OnLongPressListener onLongPressListener;
 
         private OnPageChangeListener onPageChangeListener;
 
@@ -1521,6 +1543,11 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        public Configurator onLongPress(OnLongPressListener onLongPressListener) {
+            this.onLongPressListener = onLongPressListener;
+            return this;
+        }
+
         public Configurator defaultPage(int defaultPage) {
             this.defaultPage = defaultPage;
             return this;
@@ -1563,6 +1590,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setOnPageChangeListener(onPageChangeListener);
             PDFView.this.setOnPageScrollListener(onPageScrollListener);
             PDFView.this.setOnRenderListener(onRenderListener);
+            PDFView.this.setOnLongPressListener(onLongPressListener);
             PDFView.this.setOnTapListener(onTapListener);
             PDFView.this.setOnPageErrorListener(onPageErrorListener);
             PDFView.this.enableSwipe(enableSwipe);
