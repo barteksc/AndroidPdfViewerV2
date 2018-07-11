@@ -1415,9 +1415,6 @@ public class PDFView extends RelativeLayout {
         return new Configurator(new InputStreamSource(stream));
     }
 
-    void onLongPress(MotionEvent e){
-
-    }
 
     /**
      * Use custom source as pdf source
