@@ -1251,6 +1251,14 @@ public class PDFView extends RelativeLayout {
         return optimalPageHeight;
     }
 
+    public float getPageWidth(){
+        return pageWidth;
+    }
+
+    public float getPageHeight(){
+        return pageHeight;
+    }
+
     private void setDefaultPage(int defaultPage) {
         this.defaultPage = defaultPage;
     }
