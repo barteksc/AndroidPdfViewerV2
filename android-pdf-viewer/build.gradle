@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'maven'
 
-group = 'com.github.barteksc'
+group = 'com.github.barteksc.devjtafork'
 version = '2.8.3'
 
 uploadArchives {
@@ -17,20 +17,20 @@ ext {
     bintrayRepo = 'maven'
     bintrayName = 'android-pdf-viewer'
 
-    publishedGroupId = 'com.github.barteksc'
+    publishedGroupId = 'com.github.barteksc.devjtafork'
     libraryName = 'AndroidPdfViewer'
     artifact = 'android-pdf-viewer'
 
     libraryDescription = 'Android view for displaying PDFs rendered with PdfiumAndroid'
 
-    siteUrl = 'https://github.com/barteksc/AndroidPdfViewer'
-    gitUrl = 'https://github.com/barteksc/AndroidPdfViewer.git'
+    siteUrl = 'https://github.com/devjta/AndroidPdfViewerV2'
+    gitUrl = 'https://github.com/devjta/AndroidPdfViewerV2.git'
 
     libraryVersion = '2.8.3'
 
-    developerId = 'barteksc'
-    developerName = 'Bartosz Schiller'
-    developerEmail = 'barteksch@boo.pl'
+    developerId = 'devjta'
+    developerName = 'Joerg Taschek'
+    developerEmail = 'behaveu@gmail.com'
 
     licenseName = 'The Apache Software License, Version 2.0'
     licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'

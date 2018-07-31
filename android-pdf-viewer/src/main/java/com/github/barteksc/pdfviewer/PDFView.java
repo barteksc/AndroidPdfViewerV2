@@ -93,6 +93,7 @@ public class PDFView extends RelativeLayout {
     private float minZoom = DEFAULT_MIN_SCALE;
     private float midZoom = DEFAULT_MID_SCALE;
     private float maxZoom = DEFAULT_MAX_SCALE;
+    private OnLoadCompleteListener globalOnLoadCompleteListener;
 
     /**
      * START - scrolling in first page direction
@@ -889,7 +890,9 @@ public class PDFView extends RelativeLayout {
         if (onLoadCompleteListener != null) {
             onLoadCompleteListener.loadComplete(documentPageCount);
         }
-
+        if(globalOnLoadCompleteListener != null){
+            globalOnLoadCompleteListener.loadComplete(documentPageCount);
+        }
         jumpTo(defaultPage, false);
     }
 
@@ -1386,6 +1389,15 @@ public class PDFView extends RelativeLayout {
             return new ArrayList<>();
         }
         return pdfiumCore.getTableOfContents(pdfDocument);
+    }
+
+    public void setGlobalOnLoad(OnLoadCompleteListener onLoadCompleteListener){
+        this.globalOnLoadCompleteListener = onLoadCompleteListener;
+    }
+
+    public void setAlpha(int alpha){
+        paint.setAlpha(alpha);
+        invalidate();
     }
 
     /**
