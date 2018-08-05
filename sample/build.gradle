@@ -25,7 +25,10 @@ android {
         versionCode 3
         versionName "2.0.0"
     }
-
+    packagingOptions{
+        doNotStrip '*/mips/*.so'
+        doNotStrip '*/mips64/*.so'
+    }
 }
 
 dependencies {

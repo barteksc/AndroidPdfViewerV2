@@ -49,6 +49,7 @@ android {
     }
     packagingOptions{
         doNotStrip '*/mips/*.so'
+        doNotStrip '*/mips64/*.so'
     }
 }
 
