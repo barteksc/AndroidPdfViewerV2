@@ -38,11 +38,11 @@ ext {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.3'
+    compileSdkVersion 26
+    buildToolsVersion '26.0.1'
 
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
         versionName "2.8.3"
@@ -54,7 +54,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:25.+'
+    compile 'com.android.support:support-v4:26.+'
     compile 'com.github.barteksc:pdfium-android:1.9.0'
 }
 
