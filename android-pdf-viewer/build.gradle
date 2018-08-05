@@ -42,6 +42,9 @@ android {
     buildToolsVersion '26.0.1'
 
     defaultConfig {
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86' // <- only the supported ones
+        }
         minSdkVersion 14
         targetSdkVersion 25
         versionCode 1
@@ -52,6 +55,8 @@ android {
         doNotStrip '*/mips64/*.so'
     }
 }
+
+
 
 dependencies {
     compile 'com.android.support:support-compat:26.1.0'
