@@ -51,6 +51,7 @@ android {
 }
 
 dependencies {
+    compile 'com.android.support:support-v4:25.+'
     compile 'com.github.barteksc:pdfium-android:1.7.1@aar'
 }
 
