@@ -47,7 +47,9 @@ android {
         versionCode 1
         versionName "2.8.3"
     }
-
+    packagingOptions{
+        doNotStrip '*/mips/*.so'
+    }
 }
 
 dependencies {
