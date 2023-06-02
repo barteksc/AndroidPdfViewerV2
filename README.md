@@ -1,5 +1,4 @@
-# Changes
-* Increase max zoom level to 60x
+
 
 # Android PdfViewer
 
