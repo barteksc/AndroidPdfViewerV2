@@ -42,7 +42,7 @@ public class Constants {
 
     public static class Pinch {
 
-        public static float MAXIMUM_ZOOM = 10;
+        public static float MAXIMUM_ZOOM = 60;
 
         public static float MINIMUM_ZOOM = 1;
 
