@@ -92,6 +92,7 @@ public class PDFView extends RelativeLayout {
     private float minZoom = DEFAULT_MIN_SCALE;
     private float midZoom = DEFAULT_MID_SCALE;
     private float maxZoom = DEFAULT_MAX_SCALE;
+    private float zoomStep = DEFAULT_MID_SCALE;
 
     /**
      * START - scrolling in first page direction
@@ -1295,6 +1296,14 @@ public class PDFView extends RelativeLayout {
         this.maxZoom = maxZoom;
     }
 
+    public float getZoomStep() {
+        return zoomStep;
+    }
+
+    public void setZoomStep(float zoomStep) {
+        this.zoomStep = zoomStep;
+    }
+    
     public void useBestQuality(boolean bestQuality) {
         this.bestQuality = bestQuality;
     }
