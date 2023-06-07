@@ -99,7 +99,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
 
     @Override
     public boolean onDoubleTap(MotionEvent e) {
-        if (pdfView.getZoom() <= pdfView.getMaxZoom() - pdfView.getZoomStep() {
+        if (pdfView.getZoom() <= pdfView.getMaxZoom() - pdfView.getZoomStep()) {
             pdfView.zoomWithAnimation(e.getX(), e.getY(), pdfView.getZoom() * pdfView.getZoomStep());
         } else {
             pdfView.resetZoomWithAnimation();
