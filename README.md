@@ -1,3 +1,7 @@
+# Changes
+* Update max zoom level to 60x
+* Add zoom step of 1.75 on double tap until the max zoom level is reached
+
 # Android PdfViewer
 
 __AndroidPdfViewer 1.x is available on [AndroidPdfViewerV1](https://github.com/barteksc/AndroidPdfViewerV1)
