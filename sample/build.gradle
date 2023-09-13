@@ -13,8 +13,6 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
-// TODO: check if `android-apt` needs replacement
-//apply plugin: 'android-apt'
 
 android {
     compileSdkVersion 31
@@ -30,8 +28,9 @@ android {
 
 dependencies {
     implementation project(':android-pdf-viewer')
-    //TODO: migrate to androidx
+    // TODO: migrate to androidx
     implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'org.androidannotations:androidannotations-api:4.0.0'
-    implementation 'org.androidannotations:androidannotations-api:4.0.0'
+
+    implementation 'org.androidannotations:androidannotations-api:4.8.0'
+    annotationProcessor "org.androidannotations:androidannotations:4.8.0"
 }

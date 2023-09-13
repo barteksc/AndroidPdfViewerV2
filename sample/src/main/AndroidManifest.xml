@@ -9,8 +9,7 @@
 		android:theme="@style/Theme.AppCompat.Light">
 		<activity
 			android:exported="true"
-			android:name="PDFViewActivity"
-			android:label="@string/app_name" >
+			android:name="PDFViewActivity_">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
