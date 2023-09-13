@@ -41,5 +41,6 @@ dependencies {
     compile 'com.github.barteksc:pdfium-android:1.7.1'
 }
 
+// TODO: check
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
 apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
