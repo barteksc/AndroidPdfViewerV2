@@ -82,6 +82,8 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
+        // TODO: handle link tap
+        boolean onTapHandled = pdfView.callbacks.callOnTap(e);
         OnTapListener onTapListener = pdfView.getOnTapListener();
         if (onTapListener == null || !onTapListener.onTap(e)) {
             ScrollHandle ps = pdfView.getScrollHandle();
@@ -147,7 +149,7 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
 
     @Override
     public void onLongPress(MotionEvent e) {
-
+        pdfView.callbacks.callOnLongPress(e);
     }
 
     @Override

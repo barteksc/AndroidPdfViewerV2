@@ -34,9 +34,11 @@ import android.util.Log;
 import android.widget.RelativeLayout;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
+import com.github.barteksc.pdfviewer.listener.Callbacks;
 import com.github.barteksc.pdfviewer.listener.OnDrawListener;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
+import com.github.barteksc.pdfviewer.listener.OnLongPressListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnPageScrollListener;
@@ -56,6 +58,8 @@ import com.github.barteksc.pdfviewer.util.MathUtils;
 import com.github.barteksc.pdfviewer.util.Util;
 import com.shockwave.pdfium.PdfDocument;
 import com.shockwave.pdfium.PdfiumCore;
+
+//import org.benjinus.pdfium.PdfDocument;
 
 import java.io.File;
 import java.io.InputStream;
@@ -93,6 +97,9 @@ public class PDFView extends RelativeLayout {
     private float midZoom = DEFAULT_MID_SCALE;
     private float maxZoom = DEFAULT_MAX_SCALE;
     private float zoomStep = DEFAULT_MID_SCALE;
+
+    Callbacks callbacks = new Callbacks();
+
 
     /**
      * START - scrolling in first page direction
@@ -1444,6 +1451,8 @@ public class PDFView extends RelativeLayout {
 
         private OnTapListener onTapListener;
 
+        private OnLongPressListener onLongPressListener;
+
         private OnPageErrorListener onPageErrorListener;
 
         private int defaultPage = 0;
@@ -1531,6 +1540,11 @@ public class PDFView extends RelativeLayout {
             return this;
         }
 
+        public Configurator onLongPress(OnLongPressListener onLongPressListener) {
+            this.onLongPressListener = onLongPressListener;
+            return this;
+        }
+
         public Configurator defaultPage(int defaultPage) {
             this.defaultPage = defaultPage;
             return this;
@@ -1573,7 +1587,8 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setOnPageChangeListener(onPageChangeListener);
             PDFView.this.setOnPageScrollListener(onPageScrollListener);
             PDFView.this.setOnRenderListener(onRenderListener);
-            PDFView.this.setOnTapListener(onTapListener);
+            PDFView.this.callbacks.setOnTap(onTapListener);
+            PDFView.this.callbacks.setOnLongPress(onLongPressListener);
             PDFView.this.setOnPageErrorListener(onPageErrorListener);
             PDFView.this.enableSwipe(enableSwipe);
             PDFView.this.enableDoubletap(enableDoubletap);
@@ -1596,6 +1611,41 @@ public class PDFView extends RelativeLayout {
                     }
                 }
             });
+        }
+
+        public void refresh(int currPage) {
+
+//            if (!hasSize) {
+//                waitingDocumentConfigurator = this;
+//                return;
+//            }
+            PDFView.this.recycle();
+            PDFView.this.callbacks.setOnLoadComplete(onLoadCompleteListener);
+            PDFView.this.callbacks.setOnError(onErrorListener);
+            PDFView.this.callbacks.setOnDraw(onDrawListener);
+            PDFView.this.callbacks.setOnDrawAll(onDrawAllListener);
+            PDFView.this.callbacks.setOnPageChange(onPageChangeListener);
+            PDFView.this.callbacks.setOnPageScroll(onPageScrollListener);
+            PDFView.this.callbacks.setOnRender(onRenderListener);
+            PDFView.this.callbacks.setOnTap(onTapListener);
+            PDFView.this.callbacks.setOnLongPress(onLongPressListener);
+            PDFView.this.callbacks.setOnPageError(onPageErrorListener);
+            // TODO: uncomment once we have Link
+//            PDFView.this.callbacks.setLinkHandler(linkHandler);
+
+            if (currPage != -1) {
+                // stay in curr page
+                currentPage = currPage;
+                PDFView.this.defaultPage = currentPage;
+            }
+            // TODO: overload load()
+//            if (pageNumbers != null) {
+//                PDFView.this.load(documentSource, password, pageNumbers);
+//            } else {
+//                PDFView.this.load(documentSource, password);
+//            }
+            load();
+
         }
     }
 }

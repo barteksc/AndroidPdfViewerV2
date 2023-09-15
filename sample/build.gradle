@@ -13,6 +13,7 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     compileSdkVersion 33
@@ -31,5 +32,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
 
     implementation 'org.androidannotations:androidannotations-api:4.8.0'
+    implementation 'androidx.core:core-ktx:1.8.0'
     annotationProcessor "org.androidannotations:androidannotations:4.8.0"
 }

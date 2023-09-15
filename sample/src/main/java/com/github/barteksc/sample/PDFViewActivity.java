@@ -28,12 +28,15 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
+import com.github.barteksc.pdfviewer.listener.OnLongPressListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
+import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.shockwave.pdfium.PdfDocument;
 
@@ -50,7 +53,7 @@ import java.util.List;
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.options)
 public class PDFViewActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener,
-        OnPageErrorListener {
+        OnPageErrorListener, OnTapListener, OnLongPressListener {
 
     private static final String TAG = PDFViewActivity.class.getSimpleName();
 
@@ -122,6 +125,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 .scrollHandle(new DefaultScrollHandle(this))
                 .spacing(10) // in dp
                 .onPageError(this)
+                .onTap(this)
+                .onLongPress(this)
                 .load();
     }
 
@@ -136,6 +141,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 .scrollHandle(new DefaultScrollHandle(this))
                 .spacing(10) // in dp
                 .onPageError(this)
+                .onTap(this)
+                .onLongPress(this)
                 .load();
     }
 
@@ -223,5 +230,27 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     @Override
     public void onPageError(int page, Throwable t) {
         Log.e(TAG, "Cannot load page " + page);
+    }
+
+    @Override
+    public void onLongPress(MotionEvent e) {
+        // here we have a long click
+        Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
+        Log.i(TAG, "--------------------------------------------------");
+
+        // TODO: call refresh() from configurator
+    }
+
+    @Override
+    public boolean onTap(MotionEvent e) {
+        // here we have a tap
+        Log.i(TAG, "onTap --> X: " + e.getX() + " | Y: " + e.getY());
+        Log.i(TAG, "--------------------------------------------------");
+
+//        // check zoom and scale
+//        Log.i(TAG, "zoom --> " + pdfView.getZoom() + " | scale " + pdfView.getScaleX() + " , " + pdfView.getScaleY());
+//        Log.i(TAG, "--------------------------------------------------");
+
+        return false;
     }
 }
