@@ -1,6 +1,7 @@
 package com.github.barteksc.pdfviewer.model
 
 import android.graphics.RectF
+import com.shockwave.pdfium.PdfDocument
 
 /**
  * Copyright 2016 Bartosz Schiller
@@ -28,15 +29,15 @@ class LinkTapEvent(
     val documentX: Float,
     val documentY: Float,
     val mappedLinkRect: RectF,
-//    link: Link
+    link: PdfDocument.Link
 ) {
-//    private val link: Link
-//
-//    init {
-//        this.link = link
-//    }
-//
-//    fun getLink(): Link {
-//        return link
-//    }
+    private val link: PdfDocument.Link
+
+    init {
+        this.link = link
+    }
+
+    fun getLink(): PdfDocument.Link {
+        return link
+    }
 }

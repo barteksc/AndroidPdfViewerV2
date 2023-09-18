@@ -27,13 +27,13 @@ import com.github.barteksc.pdfviewer.model.LinkTapEvent
 
 class DefaultLinkHandler(private val pdfView: PDFView) : LinkHandler {
     override fun handleLinkEvent(event: LinkTapEvent) {
-//        val uri: String = event.getLink().getUri()
-//        val page: Int = event.getLink().getDestPageIdx()
-//        if (uri.isNotEmpty()) {
-//            handleUri(uri)
-//        } else {
-//            handlePage(page)
-//        }
+        val uri: String = event.getLink().uri
+        val page: Int = event.getLink().destPageIdx
+        if (uri.isNotEmpty()) {
+            handleUri(uri)
+        } else {
+            handlePage(page)
+        }
     }
 
     private fun handleUri(uri: String) {
