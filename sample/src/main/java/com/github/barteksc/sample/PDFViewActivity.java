@@ -21,7 +21,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.PointF;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
@@ -38,6 +40,18 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
+import com.github.barteksc.pdfviewer.util.PublicFunction;
+import com.github.barteksc.pdfviewer.util.PublicValue;
+import com.lowagie.text.Annotation;
+import com.lowagie.text.Image;
+import com.lowagie.text.pdf.PdfContentByte;
+import com.lowagie.text.pdf.PdfGState;
+import com.lowagie.text.pdf.PdfImage;
+import com.lowagie.text.pdf.PdfIndirectObject;
+import com.lowagie.text.pdf.PdfLayer;
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.PdfStamper;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -49,7 +63,12 @@ import org.androidannotations.annotations.ViewById;
 import org.benjinus.pdfium.Bookmark;
 import org.benjinus.pdfium.Meta;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.util.List;
+import java.util.UUID;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.options)
@@ -238,11 +257,131 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // here we have a long click
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
-
+addAnnotation(e);
 
         // TODO: call refresh() from configurator
     }
 
+    public void addAnnotation(MotionEvent e) {
+
+        // Generate reference hash
+        String referenceHash = new StringBuilder()
+                .append(PublicValue.KEY_REFERENCE_HASH)
+                .append(UUID.randomUUID().toString())
+                .toString();
+
+
+        // Get image marker
+        byte[] OCGCover = PublicFunction.Companion.getByteFromDrawable(PDFViewActivity.this, R.drawable.marker);
+
+        // TODO: Get PDF File
+        // String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, uri);
+        String filePath = "";
+
+        // Convert coordinates
+        // latest variant is --> magicalPdfViewer.convertScreenPintsToPdfCoordinates(e)
+
+        // TODO: add method
+//        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
+
+        new Handler().post(() -> {
+            // Code here will run in UI thread
+            try {
+                // TODO:uncomment once convertScreenPintsToPdfCoordinates() is added
+//                addOCG(pointF, filePath, -2, referenceHash, OCGCover, 0, 0);
+//                    MagicalPdfCore.getInstance().addOCG(pointF, filePath, currPage, referenceHash, OCGCover, OCGWidth, OCGHeight);
+//                    MagicalPECViewModel.this.pecCoreStatus.postValue(PECCoreStatusEnum.SUCCESS);
+            } catch (Exception e1) {
+//                    MagicalPECViewModel.this.pecCoreStatus.postValue(PECCoreStatusEnum.FAILED);
+                e1.printStackTrace();
+            }
+        });
+
+    }
+
+    public boolean addOCG(PointF pointF, String filePath, int currPage, String referenceHash, byte[] OCGCover, float OCGWidth, float OCGHeight) throws Exception {
+
+        // Hint: OCG -> optional content group
+        // Hint: Page Starts From --> 1 In OpenPdf Core
+        currPage++;
+
+        // OCG width & height
+        if (OCGWidth == 0 || OCGHeight == 0) {
+            OCGWidth = PublicValue.DEFAULT_OCG_WIDTH;
+            OCGHeight = PublicValue.DEFAULT_OCG_HEIGHT;
+        }
+
+        // get file and FileOutputStream
+        if (filePath == null || filePath.isEmpty())
+            throw new Exception("Input file is empty");
+
+        File file = new File(filePath);
+
+        if (!file.exists())
+            throw new Exception("Input file does not exists");
+
+        try {
+
+            // inout stream from file
+            InputStream inputStream = new FileInputStream(file);
+
+            // we create a reader for a certain document
+            PdfReader reader = new PdfReader(inputStream);
+
+            // we create a stamper that will copy the document to a new file
+            PdfStamper stamp = new PdfStamper(reader, new FileOutputStream(file));
+
+            // get watermark icon
+            Image img = Image.getInstance(OCGCover);
+            img.setAnnotation(new Annotation(0, 0, 0, 0, referenceHash));
+            img.scaleAbsolute(OCGWidth, OCGHeight);
+            img.setAbsolutePosition(pointF.x, pointF.y);
+            PdfImage stream = new PdfImage(img, referenceHash, null);
+            stream.put(new PdfName(PublicValue.KEY_SPECIAL_ID), new PdfName(referenceHash));
+            PdfIndirectObject ref = stamp.getWriter().addToBody(stream);
+            img.setDirectReference(ref.getIndirectReference());
+
+            // add as layer
+            PdfLayer wmLayer = new PdfLayer(referenceHash, stamp.getWriter());
+
+            // prepare transparency
+            PdfGState transparent = new PdfGState();
+            transparent.setAlphaIsShape(false);
+
+            // get page file number count
+            if (reader.getNumberOfPages() < currPage) {
+                stamp.close();
+                reader.close();
+                throw new Exception("Page index is out of pdf file page numbers");
+            }
+
+            // add annotation into target page
+            PdfContentByte over = stamp.getOverContent(currPage);
+            if (over == null) {
+                stamp.close();
+                reader.close();
+                throw new Exception("GetUnderContent() is null");
+            }
+
+            // add as layer
+            over.beginLayer(wmLayer);
+            over.setGState(transparent); // set block transparency properties
+            over.addImage(img);
+            over.endLayer();
+
+            // closing PdfStamper will generate the new PDF file
+            stamp.close();
+
+            // close reader
+            reader.close();
+
+            // finish method
+            return true;
+
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
     @Override
     public boolean onTap(MotionEvent e) {
         // here we have a tap
