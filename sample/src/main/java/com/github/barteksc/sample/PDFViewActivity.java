@@ -17,6 +17,7 @@ package com.github.barteksc.sample;
 
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
+import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -24,9 +25,11 @@ import android.graphics.Color;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Handler;
+import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -42,8 +45,10 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
+import com.github.barteksc.pdfviewer.util.FileUtils;
 import com.github.barteksc.pdfviewer.util.PublicFunction;
 import com.github.barteksc.pdfviewer.util.PublicValue;
+import com.github.barteksc.pdfviewer.util.UriUtils;
 import com.lowagie.text.Annotation;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfContentByte;
@@ -68,6 +73,7 @@ import org.benjinus.pdfium.Meta;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
@@ -95,6 +101,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     Integer pageNumber = 0;
 
     String pdfFileName;
+
+    private Uri currUri = null;
+
 
     @OptionsItem(R.id.pickFile)
     void pickFile() {
@@ -175,6 +184,55 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
             displayFromUri(uri);
         }
     }
+//     TODO: use these
+//
+//@Override
+//protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//    super.onActivityResult(requestCode, resultCode, data);
+//    if (resultCode == RESULT_OK && requestCode == PublicValue.KEY_REQUEST_FILE_PICKER) {
+//        if (data != null && data.getData() != null) {
+//            this.currUri = data.getData();
+//            displayFileFromUri();
+//        }
+//    }
+//}
+//
+//    private void displayFileFromUri() {
+//
+//        if (currUri == null)
+//            return;
+//
+//        // TODO: 1/17/21  DON NOT FORGET TO USE YOUR FILE HANDLING SCENARIO FOR NEW ANDROID APIs
+//
+//        // this is OK
+//        // /storage/emulated/0/Download/PDF_ENGLISH.pdf
+//        // this.currFilePath = UriUtils.getPathFromUri(MainActivity.this, currUri);
+//
+//        // this is not OK
+//        // /data/user/0/ir.vasl.magicalpdfeditor/files/PDF_ENGLISH.pdf
+//        // this.currFilePath = PublicFunction.getFilePathForN(MainActivity.this, currUri);
+//
+//        // this is working
+//        // /storage/emulated/0/Download/PDF_ENGLISH.pdf
+//        this.currFilePath = FileUtils.newInstance(MainActivity.this).getPath(currUri);
+//        this.currFileName = PublicFunction.getFileName(MainActivity.this, currUri);
+//        this.toolbar.setSubtitle("File Name: " + currFileName);
+//
+//        this.configurator = magicalPdfViewer.fromUri(currUri)
+//                .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
+//                .onPageChange(this)
+//                .enableAnnotationRendering(true)
+//                .onLoad(this)
+//                .enableSwipe(true)
+//                .scrollHandle(new DefaultScrollHandle(this))
+//                .spacing(10) // in dp
+//                .onPageError(this)
+//                .onTap(this)
+//                .onLongPress(this)
+//                .linkHandler(this);
+//
+//        this.configurator.load();
+//    }
 
     @Override
     public void onPageChanged(int page, int pageCount) {
@@ -259,12 +317,16 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // here we have a long click
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
-        addAnnotation(e);
+        try {
+            addAnnotation(e);
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
 
         // TODO: call refresh() from configurator
     }
 
-    public void addAnnotation(MotionEvent e) {
+    public void addAnnotation(MotionEvent e) throws IOException {
 
         // Generate reference hash
         String referenceHash = new StringBuilder()
@@ -276,19 +338,23 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // Get image marker
         byte[] OCGCover = PublicFunction.Companion.getByteFromDrawable(PDFViewActivity.this, R.drawable.marker);
 
-        // TODO: Get PDF File
+        // TODO: Load uri
         // String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, uri);
-        String filePath = "";
+        File f = FileUtils.fileFromAsset(this, SAMPLE_FILE);
+        String filePath = f.getPath();
 
         // Convert coordinates
         // latest variant is --> magicalPdfViewer.convertScreenPintsToPdfCoordinates(e)
 
-        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
+        // TODO: Find out why PDFFile in PDFView is null, leading to null for pointF
+//        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
+        PointF pointF = new PointF(200, 200);
 
         new Handler().post(() -> {
             // Code here will run in UI thread
             try {
-                addOCG(pointF, filePath, -2, referenceHash, OCGCover, 0, 0);
+                boolean isAdded = addOCG(pointF, filePath, 0, referenceHash, OCGCover, 0, 0);
+                Log.d(TAG, "addAnnotation: isAdded = " + isAdded);
 //                    MagicalPdfCore.getInstance().addOCG(pointF, filePath, currPage, referenceHash, OCGCover, OCGWidth, OCGHeight);
 //                    MagicalPECViewModel.this.pecCoreStatus.postValue(PECCoreStatusEnum.SUCCESS);
             } catch (Exception e1) {
@@ -378,8 +444,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
             // finish method
             return true;
 
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
+        } catch (Exception ex) {
+            throw new Exception(ex.getMessage());
         }
     }
 
