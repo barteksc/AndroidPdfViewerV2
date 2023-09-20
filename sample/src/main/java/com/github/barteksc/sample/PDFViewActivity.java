@@ -25,10 +25,12 @@ import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Handler;
 import android.provider.OpenableColumns;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
+
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Toast;
@@ -257,7 +259,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // here we have a long click
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
-addAnnotation(e);
+        addAnnotation(e);
 
         // TODO: call refresh() from configurator
     }
@@ -281,14 +283,12 @@ addAnnotation(e);
         // Convert coordinates
         // latest variant is --> magicalPdfViewer.convertScreenPintsToPdfCoordinates(e)
 
-        // TODO: add method
-//        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
+        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
 
         new Handler().post(() -> {
             // Code here will run in UI thread
             try {
-                // TODO:uncomment once convertScreenPintsToPdfCoordinates() is added
-//                addOCG(pointF, filePath, -2, referenceHash, OCGCover, 0, 0);
+                addOCG(pointF, filePath, -2, referenceHash, OCGCover, 0, 0);
 //                    MagicalPdfCore.getInstance().addOCG(pointF, filePath, currPage, referenceHash, OCGCover, OCGWidth, OCGHeight);
 //                    MagicalPECViewModel.this.pecCoreStatus.postValue(PECCoreStatusEnum.SUCCESS);
             } catch (Exception e1) {
@@ -382,6 +382,7 @@ addAnnotation(e);
             throw new Exception(e.getMessage());
         }
     }
+
     @Override
     public boolean onTap(MotionEvent e) {
         // here we have a tap

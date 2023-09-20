@@ -31,6 +31,7 @@ import android.os.AsyncTask;
 import android.os.HandlerThread;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
@@ -65,6 +66,7 @@ import org.benjinus.pdfium.Bookmark;
 import org.benjinus.pdfium.Meta;
 import org.benjinus.pdfium.PdfDocument;
 import org.benjinus.pdfium.PdfiumSDK;
+import org.benjinus.pdfium.util.SizeF;
 
 import java.io.File;
 import java.io.InputStream;
@@ -105,6 +107,7 @@ public class PDFView extends RelativeLayout {
 
     Callbacks callbacks = new Callbacks();
 
+    public PdfFile pdfFile;
 
     /**
      * START - scrolling in first page direction
@@ -1373,6 +1376,36 @@ public class PDFView extends RelativeLayout {
 
     public boolean doRenderDuringScale() {
         return renderDuringScale;
+    }
+
+    public PointF convertScreenPintsToPdfCoordinates(MotionEvent e) {
+
+        float x = e.getX();
+        float y = e.getY();
+
+        if (pdfFile == null) {
+            return null;
+        }
+
+        float mappedX = -getCurrentXOffset() + x;
+        float mappedY = -getCurrentYOffset() + y;
+
+        int page = pdfFile.getPageAtOffset(isSwipeVertical() ? mappedY : mappedX, getZoom());
+
+        SizeF pageSize = pdfFile.getScaledPageSize(page, getZoom());
+
+        int pageX, pageY;
+
+        if (isSwipeVertical()) {
+            pageX = (int) pdfFile.getSecondaryPageOffset(page, getZoom());
+            pageY = (int) pdfFile.getPageOffset(page, getZoom());
+        } else {
+            pageY = (int) pdfFile.getSecondaryPageOffset(page, getZoom());
+            pageX = (int) pdfFile.getPageOffset(page, getZoom());
+        }
+
+        return pdfiumSDK.mapDeviceCoordinateToPage(pdfFile.getPdfDocument(), page, pageX, pageY, (int) pageSize.getWidth(),
+                (int) pageSize.getHeight(), 0, (int) mappedX, (int) mappedY);
     }
 
     public Meta getDocumentMeta() {
