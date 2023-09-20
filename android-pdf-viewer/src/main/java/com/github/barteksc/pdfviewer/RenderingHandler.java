@@ -26,8 +26,9 @@ import android.util.SparseBooleanArray;
 
 import com.github.barteksc.pdfviewer.exception.PageRenderingException;
 import com.github.barteksc.pdfviewer.model.PagePart;
-import com.shockwave.pdfium.PdfDocument;
-import com.shockwave.pdfium.PdfiumCore;
+
+import org.benjinus.pdfium.PdfDocument;
+import org.benjinus.pdfium.PdfiumSDK;
 
 /**
  * A {@link Handler} that will process incoming {@link RenderingTask} messages
@@ -42,7 +43,7 @@ class RenderingHandler extends Handler {
 
     private static final String TAG = RenderingHandler.class.getName();
 
-    private PdfiumCore pdfiumCore;
+    private PdfiumSDK pdfiumSDK;
     private PdfDocument pdfDocument;
 
     private PDFView pdfView;
@@ -53,10 +54,10 @@ class RenderingHandler extends Handler {
     private final SparseBooleanArray openedPages = new SparseBooleanArray();
     private boolean running = false;
 
-    RenderingHandler(Looper looper, PDFView pdfView, PdfiumCore pdfiumCore, PdfDocument pdfDocument) {
+    RenderingHandler(Looper looper, PDFView pdfView, PdfiumSDK pdfiumSDK, PdfDocument pdfDocument) {
         super(looper);
         this.pdfView = pdfView;
-        this.pdfiumCore = pdfiumCore;
+        this.pdfiumSDK = pdfiumSDK;
         this.pdfDocument = pdfDocument;
     }
 
@@ -96,7 +97,7 @@ class RenderingHandler extends Handler {
     private PagePart proceed(RenderingTask renderingTask) throws PageRenderingException {
         if (openedPages.indexOfKey(renderingTask.page) < 0) {
             try {
-                pdfiumCore.openPage(pdfDocument, renderingTask.page);
+                pdfiumSDK.openPage(pdfDocument, renderingTask.page);
                 openedPages.put(renderingTask.page, true);
             } catch (Exception e) {
                 openedPages.put(renderingTask.page, false);
@@ -116,7 +117,7 @@ class RenderingHandler extends Handler {
         calculateBounds(w, h, renderingTask.bounds);
         if (openedPages.get(renderingTask.page)) {
 
-            pdfiumCore.renderPageBitmap(pdfDocument, render, renderingTask.page,
+            pdfiumSDK.renderPageBitmap(pdfDocument, render, renderingTask.page,
                     roundedRenderBounds.left, roundedRenderBounds.top,
                     roundedRenderBounds.width(), roundedRenderBounds.height(), renderingTask.annotationRendering);
         } else {

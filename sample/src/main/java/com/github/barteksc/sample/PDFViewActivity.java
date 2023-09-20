@@ -38,7 +38,6 @@ import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
-import com.shockwave.pdfium.PdfDocument;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -47,6 +46,8 @@ import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
+import org.benjinus.pdfium.Bookmark;
+import org.benjinus.pdfium.Meta;
 
 import java.util.List;
 
@@ -183,7 +184,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     @Override
     public void loadComplete(int nbPages) {
-        PdfDocument.Meta meta = pdfView.getDocumentMeta();
+        Meta meta = pdfView.getDocumentMeta();
         Log.e(TAG, "title = " + meta.getTitle());
         Log.e(TAG, "author = " + meta.getAuthor());
         Log.e(TAG, "subject = " + meta.getSubject());
@@ -197,8 +198,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     }
 
-    public void printBookmarksTree(List<PdfDocument.Bookmark> tree, String sep) {
-        for (PdfDocument.Bookmark b : tree) {
+    public void printBookmarksTree(List<Bookmark> tree, String sep) {
+        for (Bookmark b : tree) {
 
             Log.e(TAG, String.format("%s %s, p %d", sep, b.getTitle(), b.getPageIdx()));
 
@@ -237,6 +238,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // here we have a long click
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
+
 
         // TODO: call refresh() from configurator
     }

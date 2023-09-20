@@ -19,8 +19,9 @@ import android.content.Context;
 import android.os.AsyncTask;
 
 import com.github.barteksc.pdfviewer.source.DocumentSource;
-import com.shockwave.pdfium.PdfDocument;
-import com.shockwave.pdfium.PdfiumCore;
+
+import org.benjinus.pdfium.PdfDocument;
+import org.benjinus.pdfium.PdfiumSDK;
 
 class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
 
@@ -29,7 +30,7 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
     private PDFView pdfView;
 
     private Context context;
-    private PdfiumCore pdfiumCore;
+    private PdfiumSDK pdfiumSDK;
     private PdfDocument pdfDocument;
     private String password;
     private DocumentSource docSource;
@@ -37,24 +38,24 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
     private int pageWidth;
     private int pageHeight;
 
-    DecodingAsyncTask(DocumentSource docSource, String password, PDFView pdfView, PdfiumCore pdfiumCore, int firstPageIdx) {
+    DecodingAsyncTask(DocumentSource docSource, String password, PDFView pdfView, PdfiumSDK pdfiumSDK, int firstPageIdx) {
         this.docSource = docSource;
         this.firstPageIdx = firstPageIdx;
         this.cancelled = false;
         this.pdfView = pdfView;
         this.password = password;
-        this.pdfiumCore = pdfiumCore;
+        this.pdfiumSDK = pdfiumSDK;
         context = pdfView.getContext();
     }
 
     @Override
     protected Throwable doInBackground(Void... params) {
         try {
-            pdfDocument = docSource.createDocument(context, pdfiumCore, password);
+            pdfDocument = docSource.createDocument(context, pdfiumSDK, password);
             // We assume all the pages are the same size
-            pdfiumCore.openPage(pdfDocument, firstPageIdx);
-            pageWidth = pdfiumCore.getPageWidth(pdfDocument, firstPageIdx);
-            pageHeight = pdfiumCore.getPageHeight(pdfDocument, firstPageIdx);
+            pdfiumSDK.openPage(pdfDocument, firstPageIdx);
+            pageWidth = pdfiumSDK.getPageWidth(pdfDocument, firstPageIdx);
+            pageHeight = pdfiumSDK.getPageHeight(pdfDocument, firstPageIdx);
             return null;
         } catch (Throwable t) {
             return t;

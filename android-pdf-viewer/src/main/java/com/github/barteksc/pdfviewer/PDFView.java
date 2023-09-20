@@ -58,10 +58,13 @@ import com.github.barteksc.pdfviewer.util.ArrayUtils;
 import com.github.barteksc.pdfviewer.util.Constants;
 import com.github.barteksc.pdfviewer.util.MathUtils;
 import com.github.barteksc.pdfviewer.util.Util;
-import com.shockwave.pdfium.PdfDocument;
-import com.shockwave.pdfium.PdfiumCore;
+//import com.shockwave.pdfium.PdfDocument;
+//import com.shockwave.pdfium.PdfiumCore;
 
-//import org.benjinus.pdfium.PdfDocument;
+import org.benjinus.pdfium.Bookmark;
+import org.benjinus.pdfium.Meta;
+import org.benjinus.pdfium.PdfDocument;
+import org.benjinus.pdfium.PdfiumSDK;
 
 import java.io.File;
 import java.io.InputStream;
@@ -281,7 +284,7 @@ public class PDFView extends RelativeLayout {
     /**
      * Pdfium core for loading and rendering PDFs
      */
-    private PdfiumCore pdfiumCore;
+    private PdfiumSDK pdfiumSDK;
 
     private PdfDocument pdfDocument;
 
@@ -353,7 +356,7 @@ public class PDFView extends RelativeLayout {
         debugPaint = new Paint();
         debugPaint.setStyle(Style.STROKE);
 
-        pdfiumCore = new PdfiumCore(context);
+        pdfiumSDK = new PdfiumSDK(context);
         setWillNotDraw(false);
     }
 
@@ -384,7 +387,7 @@ public class PDFView extends RelativeLayout {
 
         recycled = false;
         // Start decoding document
-        decodingAsyncTask = new DecodingAsyncTask(docSource, password, this, pdfiumCore, firstPageIdx);
+        decodingAsyncTask = new DecodingAsyncTask(docSource, password, this, pdfiumSDK, firstPageIdx);
         decodingAsyncTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -585,8 +588,8 @@ public class PDFView extends RelativeLayout {
             scrollHandle.destroyLayout();
         }
 
-        if (pdfiumCore != null && pdfDocument != null) {
-            pdfiumCore.closeDocument(pdfDocument);
+        if (pdfiumSDK != null && pdfDocument != null) {
+            pdfiumSDK.closeDocument(pdfDocument);
         }
 
         renderingHandler = null;
@@ -862,7 +865,7 @@ public class PDFView extends RelativeLayout {
      */
     void loadComplete(PdfDocument pdfDocument, int pageWidth, int pageHeight) {
         state = State.LOADED;
-        this.documentPageCount = pdfiumCore.getPageCount(pdfDocument);
+        this.documentPageCount = pdfiumSDK.getPageCount(pdfDocument);
 
         this.pdfDocument = pdfDocument;
 
@@ -876,7 +879,7 @@ public class PDFView extends RelativeLayout {
             renderingHandlerThread.start();
         }
         renderingHandler = new RenderingHandler(renderingHandlerThread.getLooper(),
-                this, pdfiumCore, pdfDocument);
+                this, pdfiumSDK, pdfDocument);
         renderingHandler.start();
 
         if (scrollHandle != null) {
@@ -1372,18 +1375,18 @@ public class PDFView extends RelativeLayout {
         return renderDuringScale;
     }
 
-    public PdfDocument.Meta getDocumentMeta() {
+    public Meta getDocumentMeta() {
         if (pdfDocument == null) {
             return null;
         }
-        return pdfiumCore.getDocumentMeta(pdfDocument);
+        return pdfiumSDK.getDocumentMeta(pdfDocument);
     }
 
-    public List<PdfDocument.Bookmark> getTableOfContents() {
+    public List<Bookmark> getTableOfContents() {
         if (pdfDocument == null) {
             return new ArrayList<>();
         }
-        return pdfiumCore.getTableOfContents(pdfDocument);
+        return pdfiumSDK.getTableOfContents(pdfDocument);
     }
 
     /**

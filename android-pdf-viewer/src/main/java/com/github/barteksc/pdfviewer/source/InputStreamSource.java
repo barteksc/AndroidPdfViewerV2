@@ -18,8 +18,9 @@ package com.github.barteksc.pdfviewer.source;
 import android.content.Context;
 
 import com.github.barteksc.pdfviewer.util.Util;
-import com.shockwave.pdfium.PdfDocument;
-import com.shockwave.pdfium.PdfiumCore;
+
+import org.benjinus.pdfium.PdfDocument;
+import org.benjinus.pdfium.PdfiumSDK;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,7 +34,7 @@ public class InputStreamSource implements DocumentSource {
     }
 
     @Override
-    public PdfDocument createDocument(Context context, PdfiumCore core, String password) throws IOException {
+    public PdfDocument createDocument(Context context, PdfiumSDK core, String password) throws IOException {
         return core.newDocument(Util.toByteArray(inputStream), password);
     }
 }
