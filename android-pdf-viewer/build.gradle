@@ -18,5 +18,4 @@ dependencies {
     api 'com.github.hamidrezaamz:android-support-pdfium:1.0.8'
     implementation("androidx.core:core-ktx:1.9.0")
 
-    implementation project(":sample")
 }
