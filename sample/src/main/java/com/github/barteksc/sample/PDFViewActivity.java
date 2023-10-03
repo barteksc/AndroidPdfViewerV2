@@ -17,19 +17,23 @@ package com.github.barteksc.sample;
 
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
+import android.os.PersistableBundle;
 import android.provider.OpenableColumns;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
@@ -39,16 +43,17 @@ import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnLongPressListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
 import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
+import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.github.barteksc.pdfviewer.util.FileUtils;
 import com.github.barteksc.pdfviewer.util.PublicFunction;
 import com.github.barteksc.pdfviewer.util.PublicValue;
-import com.github.barteksc.pdfviewer.util.UriUtils;
 import com.lowagie.text.Annotation;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfContentByte;
@@ -81,7 +86,7 @@ import java.util.UUID;
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.options)
 public class PDFViewActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener,
-        OnPageErrorListener, OnTapListener, OnLongPressListener {
+        OnPageErrorListener, OnTapListener, OnLongPressListener , LinkHandler {
 
     private static final String TAG = PDFViewActivity.class.getSimpleName();
 
@@ -91,6 +96,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     public static final String SAMPLE_FILE = "foo.pdf";
 //    public static final String SAMPLE_FILE = "sample.pdf";
     public static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
+
+    PDFView.Configurator configurator = null;
 
     @ViewById
     PDFView pdfView;
@@ -135,6 +142,14 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         }
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
+        super.onCreate(savedInstanceState, persistentState);
+
+        this.pdfView = findViewById(R.id.pdfView);
+
+    }
+
     @AfterViews
     void afterViews() {
         pdfView.setBackgroundColor(Color.LTGRAY);
@@ -149,8 +164,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     private void displayFromAsset(String assetFileName) {
         pdfFileName = assetFileName;
 
-        pdfView.fromAsset(SAMPLE_FILE)
-                .defaultPage(pageNumber)
+        this.configurator = pdfView.fromAsset(SAMPLE_FILE)
+                .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
                 .onPageChange(this)
                 .enableAnnotationRendering(true)
                 .onLoad(this)
@@ -159,7 +174,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 .onPageError(this)
                 .onTap(this)
                 .onLongPress(this)
-                .load();
+                .linkHandler(this);
+
+        this.configurator.load();
     }
 
     private void displayFromUri(Uri uri) {
@@ -218,8 +235,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 //        this.currFilePath = FileUtils.newInstance(MainActivity.this).getPath(currUri);
 //        this.currFileName = PublicFunction.getFileName(MainActivity.this, currUri);
 //        this.toolbar.setSubtitle("File Name: " + currFileName);
-//
-//        this.configurator = magicalPdfViewer.fromUri(currUri)
+
+//        this.configurator = pdfView.fromUri(currUri)
 //                .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
 //                .onPageChange(this)
 //                .enableAnnotationRendering(true)
@@ -320,11 +337,12 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         try {
             addAnnotation(e);
+
+            configurator.refresh(pdfView.getCurrentPage()); // refresh view
+
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
-
-        // TODO: call refresh() from configurator
     }
 
     public void addAnnotation(MotionEvent e) throws IOException {
@@ -461,5 +479,10 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 //        Log.i(TAG, "--------------------------------------------------");
 
         return false;
+    }
+
+    @Override
+    public void handleLinkEvent(LinkTapEvent event) {
+        // TODO
     }
 }

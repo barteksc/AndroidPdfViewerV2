@@ -1496,6 +1496,8 @@ public class PDFView extends RelativeLayout {
 
         private OnPageErrorListener onPageErrorListener;
 
+        private LinkHandler linkHandler = new DefaultLinkHandler(PDFView.this);
+
         private int defaultPage = 0;
 
         private boolean swipeHorizontal = false;
@@ -1583,6 +1585,11 @@ public class PDFView extends RelativeLayout {
 
         public Configurator onLongPress(OnLongPressListener onLongPressListener) {
             this.onLongPressListener = onLongPressListener;
+            return this;
+        }
+
+        public Configurator linkHandler(LinkHandler linkHandler) {
+            this.linkHandler = linkHandler;
             return this;
         }
 

@@ -24,5 +24,5 @@ import org.benjinus.pdfium.PdfiumSDK;
 import java.io.IOException;
 
 public interface DocumentSource {
-    PdfDocument createDocument(Context context, PdfiumSDK core, String password) throws IOException;
+    PdfDocument createDocument(Context context, PdfiumSDK pdfiumSDK, String password) throws IOException;
 }
