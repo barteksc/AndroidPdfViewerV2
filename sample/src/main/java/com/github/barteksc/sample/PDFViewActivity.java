@@ -357,6 +357,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
         String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
 
+        Log.d(TAG, "addAnnotation: filePath " + filePath);
+
         // Convert coordinates
         // latest variant is --> magicalPdfViewer.convertScreenPintsToPdfCoordinates(e)
 
