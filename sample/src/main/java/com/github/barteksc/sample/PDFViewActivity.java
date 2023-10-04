@@ -82,7 +82,7 @@ import java.util.UUID;
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.options)
 public class PDFViewActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener,
-        OnPageErrorListener, OnTapListener, OnLongPressListener , LinkHandler {
+        OnPageErrorListener, OnTapListener, OnLongPressListener, LinkHandler {
 
     private static final String TAG = PDFViewActivity.class.getSimpleName();
 
@@ -90,7 +90,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     public static final int PERMISSION_CODE = 42042;
 
     public static final String SAMPLE_FILE = "foo.pdf";
-//    public static final String SAMPLE_FILE = "sample.pdf";
+    //    public static final String SAMPLE_FILE = "sample.pdf";
     public static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 
     PDFView.Configurator configurator = null;
@@ -160,7 +160,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     }
 
 
-
     private void displayFromAsset(String assetFileName) {
         pdfFileName = assetFileName;
 
@@ -195,25 +194,24 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 .load();
     }
 
-//     TODO: use these
+    //     TODO: use these
 //
-@Override
-protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-    super.onActivityResult(requestCode, resultCode, data);
-    if (resultCode == RESULT_OK && requestCode == PublicValue.KEY_REQUEST_FILE_PICKER) {
-        if (data != null && data.getData() != null) {
-            this.currUri = data.getData();
-            displayFileFromUri();
-        }
-        else{
-            Log.e(TAG, "onActivityResult, requestCode:" + requestCode +"resultCode:" + resultCode );
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == PublicValue.KEY_REQUEST_FILE_PICKER) {
+            if (data != null && data.getData() != null) {
+                this.currUri = data.getData();
+                displayFileFromUri();
+            } else {
+                Log.e(TAG, "onActivityResult, requestCode:" + requestCode + "resultCode:" + resultCode);
+            }
         }
     }
-}
 
     private void displayFileFromUri() {
 
-        if (currUri == null){
+        if (currUri == null) {
             Toast.makeText(this, "currUri is null", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -354,21 +352,18 @@ protected void onActivityResult(int requestCode, int resultCode, @Nullable Inten
                 .append(UUID.randomUUID().toString())
                 .toString();
 
-
         // Get image marker
         byte[] OCGCover = PublicFunction.Companion.getByteFromDrawable(PDFViewActivity.this, R.drawable.marker);
 
-         String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
-
-//        File f = FileUtils.fileFromAsset(this, SAMPLE_FILE);
-//        String filePath = f.getPath();
-//        String filePath = filepath.getPath();
+        String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
 
         // Convert coordinates
         // latest variant is --> magicalPdfViewer.convertScreenPintsToPdfCoordinates(e)
 
         // TODO: Find out why PDFFile in PDFView is null, leading to null for pointF
 //        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
+
+        // Test point
         PointF pointF = new PointF(200, 200);
 
         new Handler().post(() -> {
