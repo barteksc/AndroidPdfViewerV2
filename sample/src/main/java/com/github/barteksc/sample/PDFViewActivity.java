@@ -15,6 +15,8 @@
  */
 package com.github.barteksc.sample;
 
+import static com.github.barteksc.pdfviewer.util.PublicValue.KEY_REQUEST_FILE_PICKER;
+
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
@@ -36,11 +38,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.util.Log;
-import android.view.MotionEvent;
-import android.widget.Toast;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
@@ -51,9 +48,9 @@ import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
-import com.github.barteksc.pdfviewer.util.FileUtils;
 import com.github.barteksc.pdfviewer.util.PublicFunction;
 import com.github.barteksc.pdfviewer.util.PublicValue;
+import com.github.barteksc.pdfviewer.util.UriUtils;
 import com.lowagie.text.Annotation;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfContentByte;
@@ -68,7 +65,6 @@ import com.lowagie.text.pdf.PdfStamper;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.NonConfigurationInstance;
-import org.androidannotations.annotations.OnActivityResult;
 import org.androidannotations.annotations.OptionsItem;
 import org.androidannotations.annotations.OptionsMenu;
 import org.androidannotations.annotations.ViewById;
@@ -111,6 +107,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     String pdfFileName;
 
     private Uri currUri = null;
+    private String currFileName;
+    private String currFilePath;
 
 
     @OptionsItem(R.id.pickFile)
@@ -135,7 +133,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("application/pdf");
         try {
-            startActivityForResult(intent, REQUEST_CODE);
+            startActivityForResult(intent, KEY_REQUEST_FILE_PICKER);
         } catch (ActivityNotFoundException e) {
             //alert user that file manager not working
             Toast.makeText(this, R.string.toast_pick_file_error, Toast.LENGTH_SHORT).show();
@@ -153,13 +151,15 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     @AfterViews
     void afterViews() {
         pdfView.setBackgroundColor(Color.LTGRAY);
-        if (uri != null) {
-            displayFromUri(uri);
-        } else {
-            displayFromAsset(SAMPLE_FILE);
-        }
+//        if (uri != null) {
+//            displayFromUri(uri);
+//        } else {
+//            displayFromAsset(SAMPLE_FILE);
+//        }
         setTitle(pdfFileName);
     }
+
+
 
     private void displayFromAsset(String assetFileName) {
         pdfFileName = assetFileName;
@@ -195,62 +195,63 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 .load();
     }
 
-    @OnActivityResult(REQUEST_CODE)
-    public void onResult(int resultCode, Intent intent) {
-        if (resultCode == RESULT_OK) {
-            uri = intent.getData();
-            displayFromUri(uri);
-        }
-    }
 //     TODO: use these
 //
-//@Override
-//protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//    super.onActivityResult(requestCode, resultCode, data);
-//    if (resultCode == RESULT_OK && requestCode == PublicValue.KEY_REQUEST_FILE_PICKER) {
-//        if (data != null && data.getData() != null) {
-//            this.currUri = data.getData();
-//            displayFileFromUri();
-//        }
-//    }
-//}
-//
-//    private void displayFileFromUri() {
-//
-//        if (currUri == null)
-//            return;
-//
-//        // TODO: 1/17/21  DON NOT FORGET TO USE YOUR FILE HANDLING SCENARIO FOR NEW ANDROID APIs
-//
-//        // this is OK
-//        // /storage/emulated/0/Download/PDF_ENGLISH.pdf
-//        // this.currFilePath = UriUtils.getPathFromUri(MainActivity.this, currUri);
-//
-//        // this is not OK
-//        // /data/user/0/ir.vasl.magicalpdfeditor/files/PDF_ENGLISH.pdf
-//        // this.currFilePath = PublicFunction.getFilePathForN(MainActivity.this, currUri);
-//
-//        // this is working
-//        // /storage/emulated/0/Download/PDF_ENGLISH.pdf
-//        this.currFilePath = FileUtils.newInstance(MainActivity.this).getPath(currUri);
-//        this.currFileName = PublicFunction.getFileName(MainActivity.this, currUri);
-//        this.toolbar.setSubtitle("File Name: " + currFileName);
+@Override
+protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    if (resultCode == RESULT_OK && requestCode == PublicValue.KEY_REQUEST_FILE_PICKER) {
+        if (data != null && data.getData() != null) {
+            this.currUri = data.getData();
+            displayFileFromUri();
+        }
+        else{
+            Log.e(TAG, "onActivityResult, requestCode:" + requestCode +"resultCode:" + resultCode );
+        }
+    }
+}
 
-//        this.configurator = pdfView.fromUri(currUri)
-//                .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
-//                .onPageChange(this)
-//                .enableAnnotationRendering(true)
-//                .onLoad(this)
-//                .enableSwipe(true)
-//                .scrollHandle(new DefaultScrollHandle(this))
-//                .spacing(10) // in dp
-//                .onPageError(this)
-//                .onTap(this)
-//                .onLongPress(this)
-//                .linkHandler(this);
-//
-//        this.configurator.load();
-//    }
+    private void displayFileFromUri() {
+
+        if (currUri == null){
+            Toast.makeText(this, "currUri is null", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+
+        // TODO: 1/17/21  DON NOT FORGET TO USE YOUR FILE HANDLING SCENARIO FOR NEW ANDROID APIs
+
+        // this is OK
+        // /storage/emulated/0/Download/PDF_ENGLISH.pdf
+        // this.currFilePath = UriUtils.getPathFromUri(MainActivity.this, currUri);
+
+        // this is not OK
+        // /data/user/0/ir.vasl.magicalpdfeditor/files/PDF_ENGLISH.pdf
+        // this.currFilePath = PublicFunction.getFilePathForN(MainActivity.this, currUri);
+
+        // this is working
+        // /storage/emulated/0/Download/PDF_ENGLISH.pdf
+
+        pdfFileName = getFileName(currUri);
+
+        this.currFilePath = UriUtils.getPathFromUri(this, currUri);
+        this.currFileName = pdfFileName;
+
+        this.configurator = pdfView.fromUri(currUri)
+                .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
+                .onPageChange(this)
+                .enableAnnotationRendering(true)
+                .onLoad(this)
+                .enableSwipe(true)
+                .scrollHandle(new DefaultScrollHandle(this))
+                .spacing(10) // in dp
+                .onPageError(this)
+                .onTap(this)
+                .onLongPress(this)
+                .linkHandler(this);
+
+        this.configurator.load();
+    }
 
     @Override
     public void onPageChanged(int page, int pageCount) {
@@ -357,10 +358,11 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // Get image marker
         byte[] OCGCover = PublicFunction.Companion.getByteFromDrawable(PDFViewActivity.this, R.drawable.marker);
 
-        // TODO: Load uri
-        // String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, uri);
-        File f = FileUtils.fileFromAsset(this, SAMPLE_FILE);
-        String filePath = f.getPath();
+         String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
+
+//        File f = FileUtils.fileFromAsset(this, SAMPLE_FILE);
+//        String filePath = f.getPath();
+//        String filePath = filepath.getPath();
 
         // Convert coordinates
         // latest variant is --> magicalPdfViewer.convertScreenPintsToPdfCoordinates(e)

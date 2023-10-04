@@ -4,7 +4,9 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+
 import androidx.core.content.ContextCompat;
+
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.ViewGroup;
@@ -90,7 +92,8 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
         LayoutParams tvlp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         tvlp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
-        addView(textView, tvlp);
+        // todo:check why this causes java.lang.IllegalStateException: The specified child already has a parent. You must call removeView() on the child's parent first.parent=com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle
+        // addView(textView, tvlp);
 
         lp.addRule(align);
         pdfView.addView(this, lp);
