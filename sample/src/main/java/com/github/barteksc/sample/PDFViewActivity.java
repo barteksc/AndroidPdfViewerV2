@@ -41,6 +41,7 @@ import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
+import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
 import com.github.barteksc.pdfviewer.listener.OnLongPressListener;
 import com.github.barteksc.pdfviewer.listener.OnPageChangeListener;
@@ -81,7 +82,7 @@ import java.util.UUID;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.options)
-public class PDFViewActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener,
+public class PDFViewActivity extends AppCompatActivity implements OnPageChangeListener, OnLoadCompleteListener, OnErrorListener,
         OnPageErrorListener, OnTapListener, OnLongPressListener, LinkHandler {
 
     private static final String TAG = PDFViewActivity.class.getSimpleName();
@@ -160,42 +161,40 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     }
 
 
-    private void displayFromAsset(String assetFileName) {
-        pdfFileName = assetFileName;
-
-        this.configurator = pdfView.fromAsset(SAMPLE_FILE)
-                .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
-                .onPageChange(this)
-                .enableAnnotationRendering(true)
-                .onLoad(this)
-                .scrollHandle(new DefaultScrollHandle(this))
-                .spacing(10) // in dp
-                .onPageError(this)
-                .onTap(this)
-                .onLongPress(this)
-                .linkHandler(this);
-
-        this.configurator.load();
-    }
-
-    private void displayFromUri(Uri uri) {
-        pdfFileName = getFileName(uri);
-
-        pdfView.fromUri(uri)
-                .defaultPage(pageNumber)
-                .onPageChange(this)
-                .enableAnnotationRendering(true)
-                .onLoad(this)
-                .scrollHandle(new DefaultScrollHandle(this))
-                .spacing(10) // in dp
-                .onPageError(this)
-                .onTap(this)
-                .onLongPress(this)
-                .load();
-    }
-
-    //     TODO: use these
+//    private void displayFromAsset(String assetFileName) {
+//        pdfFileName = assetFileName;
 //
+//        this.configurator = pdfView.fromAsset(SAMPLE_FILE)
+//                .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
+//                .onPageChange(this)
+//                .enableAnnotationRendering(true)
+//                .onLoad(this)
+//                .scrollHandle(new DefaultScrollHandle(this))
+//                .spacing(10) // in dp
+//                .onPageError(this)
+//                .onTap(this)
+//                .onLongPress(this)
+//                .linkHandler(this);
+//
+//        this.configurator.load();
+//    }
+//
+//    private void displayFromUri(Uri uri) {
+//        pdfFileName = getFileName(uri);
+//
+//        pdfView.fromUri(uri)
+//                .defaultPage(pageNumber)
+//                .onPageChange(this)
+//                .enableAnnotationRendering(true)
+//                .onLoad(this)
+//                .scrollHandle(new DefaultScrollHandle(this))
+//                .spacing(10) // in dp
+//                .onPageError(this)
+//                .onTap(this)
+//                .onLongPress(this)
+//                .load();
+//    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -363,10 +362,10 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // latest variant is --> magicalPdfViewer.convertScreenPintsToPdfCoordinates(e)
 
         // TODO: Find out why PDFFile in PDFView is null, leading to null for pointF
-//        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
+        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
 
         // Test point
-        PointF pointF = new PointF(200, 200);
+//        PointF pointF = new PointF(200, 200);
 
         new Handler().post(() -> {
             // Code here will run in UI thread
@@ -483,5 +482,10 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     @Override
     public void handleLinkEvent(LinkTapEvent event) {
         // TODO
+    }
+
+    @Override
+    public void onError(Throwable t) {
+        Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG ).show();
     }
 }
