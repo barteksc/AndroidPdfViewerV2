@@ -29,6 +29,9 @@ public class Constants {
      */
     public static float PART_SIZE = 256;
 
+    /** Part of document above and below screen that should be preloaded, in dp */
+    public static int PRELOAD_OFFSET = 20;
+
     /** Number of preloaded rows or columns */
     public static int PRELOAD_COUNT = 1;
 

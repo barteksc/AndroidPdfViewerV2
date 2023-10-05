@@ -30,7 +30,7 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
 
     private boolean cancelled;
 
-    private PDFView pdfView;
+//    private PDFView pdfView;
 
     private Context context;
     private PdfiumSDK pdfiumSDK;
@@ -47,16 +47,25 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
     private PdfFile pdfFile;
 
 
-    DecodingAsyncTask(DocumentSource docSource, String password,  int[] userPages, PDFView pdfView, PdfiumSDK pdfiumSDK, int firstPageIdx) {
+//    DecodingAsyncTask(DocumentSource docSource, String password,  int[] userPages, PDFView pdfView, PdfiumSDK pdfiumSDK, int firstPageIdx) {
+//        this.docSource = docSource;
+//        this.firstPageIdx = firstPageIdx;
+//        this.cancelled = false;
+//        this.userPages = userPages;
+//        this.pdfView = pdfView;
+//        this.pdfViewReference = new WeakReference<>(pdfView);
+//        this.password = password;
+//        this.pdfiumSDK = pdfiumSDK;
+//        context = pdfView.getContext();
+//    }
+
+    DecodingAsyncTask(DocumentSource docSource, String password, int[] userPages, PDFView pdfView, PdfiumSDK pdfiumSDK) {
         this.docSource = docSource;
-        this.firstPageIdx = firstPageIdx;
-        this.cancelled = false;
         this.userPages = userPages;
-        this.pdfView = pdfView;
+        this.cancelled = false;
         this.pdfViewReference = new WeakReference<>(pdfView);
         this.password = password;
         this.pdfiumSDK = pdfiumSDK;
-        context = pdfView.getContext();
     }
 
     @Override
@@ -91,6 +100,7 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
 
     @Override
     protected void onPostExecute(Throwable t) {
+        PDFView pdfView = pdfViewReference.get();
         if (t != null) {
             pdfView.loadError(t);
             return;
