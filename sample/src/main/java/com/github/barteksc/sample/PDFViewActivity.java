@@ -40,6 +40,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.annotation.OCGRemover;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -53,6 +54,7 @@ import com.github.barteksc.pdfviewer.util.DebugUtilKt;
 import com.github.barteksc.pdfviewer.util.PublicFunction;
 import com.github.barteksc.pdfviewer.util.PublicValue;
 import com.github.barteksc.pdfviewer.util.UriUtils;
+import com.google.android.material.snackbar.Snackbar;
 import com.lowagie.text.Annotation;
 import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfContentByte;
@@ -419,6 +421,64 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         }
     }
 
+    public boolean removeOCG(String filePath, String annotationHash) throws Exception {
+
+        // get file and FileOutputStream
+        if (filePath == null || filePath.isEmpty())
+            throw new Exception("Input file is empty");
+
+        File file = new File(filePath);
+
+        if (!file.exists())
+            throw new Exception("Input file does not exists");
+
+        try {
+
+            // inout stream from file
+            InputStream inputStream = new FileInputStream(file);
+
+            // we create a reader for a certain document
+            PdfReader pdfReader = new PdfReader(inputStream);
+
+            // we create a stamper that will copy the document to a new file
+            PdfStamper pdfStamper = new PdfStamper(pdfReader, new FileOutputStream(file));
+
+            // remove target object
+            OCGRemover ocgRemover = new OCGRemover();
+            ocgRemover.removeLayers(pdfReader, annotationHash);
+
+            // closing PdfStamper will generate the new PDF file
+            pdfStamper.close();
+
+            // close reader
+            pdfReader.close();
+
+            // finish method
+            return true;
+
+        } catch (Exception e) {
+            throw new Exception(e.getMessage());
+        }
+    }
+
+    public void showSnackbar(String referenceHash) {
+        String message = "Clicked: " + referenceHash;
+        Snackbar snackbar = Snackbar.make(pdfView, message, Snackbar.LENGTH_LONG);
+        snackbar.setAction("Delete", v -> deleteAnnotation(referenceHash));
+        snackbar.show();
+    }
+
+    public void deleteAnnotation(String referenceHash) {
+        try {
+            // PDFDrawer.removeAllAnnotation(filePath, pdfView.getCurrentPage());
+            String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
+            removeOCG(filePath, referenceHash);
+            configurator.refresh(pdfView.getCurrentPage()); // refresh view
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public boolean onTap(MotionEvent e) {
         // here we have a tap
@@ -435,7 +495,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     @Override
     public void handleLinkEvent(LinkTapEvent event) {
         String referenceHash = event.getLink().getUri();
-        DebugUtilKt.toast(this, "tapped:" + referenceHash);
+        showSnackbar(referenceHash);
     }
 
     @Override

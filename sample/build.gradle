@@ -33,6 +33,7 @@ dependencies {
 
     implementation 'org.androidannotations:androidannotations-api:4.8.0'
     implementation 'androidx.core:core-ktx:1.8.0'
+    implementation 'com.google.android.material:material:1.7.0'
     annotationProcessor "org.androidannotations:androidannotations:4.8.0"
 
     // OpenPDF
