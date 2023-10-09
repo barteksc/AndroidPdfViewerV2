@@ -91,7 +91,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     public static final int PERMISSION_CODE = 42042;
 
     public static final String SAMPLE_FILE = "foo.pdf";
-    //    public static final String SAMPLE_FILE = "sample.pdf";
     public static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 
     PDFView.Configurator configurator = null;
@@ -152,48 +151,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     @AfterViews
     void afterViews() {
         pdfView.setBackgroundColor(Color.LTGRAY);
-//        if (uri != null) {
-//            displayFromUri(uri);
-//        } else {
-//            displayFromAsset(SAMPLE_FILE);
-//        }
         setTitle(pdfFileName);
     }
 
-
-//    private void displayFromAsset(String assetFileName) {
-//        pdfFileName = assetFileName;
-//
-//        this.configurator = pdfView.fromAsset(SAMPLE_FILE)
-//                .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
-//                .onPageChange(this)
-//                .enableAnnotationRendering(true)
-//                .onLoad(this)
-//                .scrollHandle(new DefaultScrollHandle(this))
-//                .spacing(10) // in dp
-//                .onPageError(this)
-//                .onTap(this)
-//                .onLongPress(this)
-//                .linkHandler(this);
-//
-//        this.configurator.load();
-//    }
-//
-//    private void displayFromUri(Uri uri) {
-//        pdfFileName = getFileName(uri);
-//
-//        pdfView.fromUri(uri)
-//                .defaultPage(pageNumber)
-//                .onPageChange(this)
-//                .enableAnnotationRendering(true)
-//                .onLoad(this)
-//                .scrollHandle(new DefaultScrollHandle(this))
-//                .spacing(10) // in dp
-//                .onPageError(this)
-//                .onTap(this)
-//                .onLongPress(this)
-//                .load();
-//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

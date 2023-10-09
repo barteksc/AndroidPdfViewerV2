@@ -30,34 +30,16 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
 
     private boolean cancelled;
 
-//    private PDFView pdfView;
 
     private Context context;
     private PdfiumSDK pdfiumSDK;
-//    private PdfDocument pdfDocument;
 
     private String password;
     private DocumentSource docSource;
-    private int firstPageIdx;
-    private int pageWidth;
-    private int pageHeight;
 
     private int[] userPages;
     private WeakReference<PDFView> pdfViewReference;
     private PdfFile pdfFile;
-
-
-//    DecodingAsyncTask(DocumentSource docSource, String password,  int[] userPages, PDFView pdfView, PdfiumSDK pdfiumSDK, int firstPageIdx) {
-//        this.docSource = docSource;
-//        this.firstPageIdx = firstPageIdx;
-//        this.cancelled = false;
-//        this.userPages = userPages;
-//        this.pdfView = pdfView;
-//        this.pdfViewReference = new WeakReference<>(pdfView);
-//        this.password = password;
-//        this.pdfiumSDK = pdfiumSDK;
-//        context = pdfView.getContext();
-//    }
 
     DecodingAsyncTask(DocumentSource docSource, String password, int[] userPages, PDFView pdfView, PdfiumSDK pdfiumSDK) {
         this.docSource = docSource;
@@ -86,16 +68,6 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
             return t;
         }
 
-//        try {
-//            pdfDocument = docSource.createDocument(context, pdfiumSDK, password);
-//            // We assume all the pages are the same size
-//            pdfiumSDK.openPage(pdfDocument, firstPageIdx);
-//            pageWidth = pdfiumSDK.getPageWidth(pdfDocument, firstPageIdx);
-//            pageHeight = pdfiumSDK.getPageHeight(pdfDocument, firstPageIdx);
-//            return null;
-//        } catch (Throwable t) {
-//            return t;
-//        }
     }
 
     @Override
@@ -106,7 +78,6 @@ class DecodingAsyncTask extends AsyncTask<Void, Void, Throwable> {
             return;
         }
         if (!cancelled) {
-//            pdfView.loadComplete(pdfDocument, pageWidth, pageHeight);
             pdfView.loadComplete(pdfFile);
         }
     }
