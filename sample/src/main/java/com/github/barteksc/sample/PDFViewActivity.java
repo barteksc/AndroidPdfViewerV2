@@ -318,8 +318,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         new Handler().post(() -> {
             // Code here will run in UI thread
             try {
-                // todo: use real currPage
-                boolean isAdded = addOCG(pointF, filePath, 1, referenceHash, OCGCover, 0, 0);
+                boolean isAdded = addOCG(pointF, filePath, pdfView.getCurrentPage(), referenceHash, OCGCover, 0, 0);
                 Log.d(TAG, "addAnnotation: isAdded = " + isAdded);
 
                 if(isAdded){
