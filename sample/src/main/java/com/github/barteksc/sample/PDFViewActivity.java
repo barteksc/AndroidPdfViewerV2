@@ -49,6 +49,7 @@ import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
+import com.github.barteksc.pdfviewer.util.DebugUtilKt;
 import com.github.barteksc.pdfviewer.util.PublicFunction;
 import com.github.barteksc.pdfviewer.util.PublicValue;
 import com.github.barteksc.pdfviewer.util.UriUtils;
@@ -321,7 +322,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 boolean isAdded = addOCG(pointF, filePath, pdfView.getCurrentPage(), referenceHash, OCGCover, 0, 0);
                 Log.d(TAG, "addAnnotation: isAdded = " + isAdded);
 
-                if(isAdded){
+                if (isAdded) {
                     configurator.refresh(pdfView.getCurrentPage()); // refresh view
                 }
 //                    MagicalPdfCore.getInstance().addOCG(pointF, filePath, currPage, referenceHash, OCGCover, OCGWidth, OCGHeight);
@@ -433,11 +434,12 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     @Override
     public void handleLinkEvent(LinkTapEvent event) {
-        // TODO
+        String referenceHash = event.getLink().getUri();
+        DebugUtilKt.toast(this, "tapped:" + referenceHash);
     }
 
     @Override
     public void onError(Throwable t) {
-        Toast.makeText(this, t.getMessage(), Toast.LENGTH_LONG ).show();
+        DebugUtilKt.toast(this, t.getMessage());
     }
 }
