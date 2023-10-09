@@ -323,7 +323,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
         // TODO: Find out why PDFFile in PDFView is null, leading to null for pointF
         PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
-
+        Toast.makeText(this, "pointF is " + pointF, Toast.LENGTH_LONG).show();
         // Test point
 //        PointF pointF = new PointF(200, 200);
 
