@@ -295,9 +295,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         try {
             addAnnotation(e);
-
-            configurator.refresh(pdfView.getCurrentPage()); // refresh view
-
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -316,22 +313,18 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
         String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
 
-        Log.d(TAG, "addAnnotation: filePath " + filePath);
-
-        // Convert coordinates
-        // latest variant is --> magicalPdfViewer.convertScreenPintsToPdfCoordinates(e)
-
-        // TODO: Find out why PDFFile in PDFView is null, leading to null for pointF
         PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
-        Toast.makeText(this, "pointF is " + pointF, Toast.LENGTH_LONG).show();
-        // Test point
-//        PointF pointF = new PointF(200, 200);
 
         new Handler().post(() -> {
             // Code here will run in UI thread
             try {
-                boolean isAdded = addOCG(pointF, filePath, 0, referenceHash, OCGCover, 0, 0);
+                // todo: use real currPage
+                boolean isAdded = addOCG(pointF, filePath, 1, referenceHash, OCGCover, 0, 0);
                 Log.d(TAG, "addAnnotation: isAdded = " + isAdded);
+
+                if(isAdded){
+                    configurator.refresh(pdfView.getCurrentPage()); // refresh view
+                }
 //                    MagicalPdfCore.getInstance().addOCG(pointF, filePath, currPage, referenceHash, OCGCover, OCGWidth, OCGHeight);
 //                    MagicalPECViewModel.this.pecCoreStatus.postValue(PECCoreStatusEnum.SUCCESS);
             } catch (Exception e1) {
