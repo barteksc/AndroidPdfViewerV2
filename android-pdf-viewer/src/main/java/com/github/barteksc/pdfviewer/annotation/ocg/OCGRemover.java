@@ -1,4 +1,4 @@
-package com.github.barteksc.pdfviewer.annotation;
+package com.github.barteksc.pdfviewer.annotation.ocg;
 
 import com.lowagie.text.pdf.PRStream;
 import com.lowagie.text.pdf.PdfArray;
