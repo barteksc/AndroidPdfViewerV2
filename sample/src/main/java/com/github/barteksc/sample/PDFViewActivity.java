@@ -173,7 +173,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     private void displayFileFromUri() {
 
         if (currUri == null) {
-            DebugUtilKt.toast(this,"currUri is null");
+            DebugUtilKt.toast(this, "currUri is null");
             return;
         }
 
@@ -324,6 +324,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
                 if (isAdded) {
                     configurator.refresh(pdfView.getCurrentPage()); // refresh view
+                } else {
+                    DebugUtilKt.toast(this, "Annotation couldn't be added");
                 }
 //                    MagicalPdfCore.getInstance().addOCG(pointF, filePath, currPage, referenceHash, OCGCover, OCGWidth, OCGHeight);
 //                    MagicalPECViewModel.this.pecCoreStatus.postValue(PECCoreStatusEnum.SUCCESS);
@@ -469,8 +471,23 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     public void deleteAnnotation(String referenceHash) {
         try {
             String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
-            removeOCG(filePath, referenceHash);
-            configurator.refresh(pdfView.getCurrentPage()); // refresh view
+
+            new Handler().post(() -> {
+                // Code here will run in UI thread
+                try {
+                    boolean isRemoved = removeOCG(filePath, referenceHash);
+
+                    Log.d(TAG, "deleteAnnotation: isDeleted = " + isRemoved);
+
+                    if (isRemoved) {
+                        configurator.refresh(pdfView.getCurrentPage()); // refresh view
+                    } else {
+                        DebugUtilKt.toast(this, "Annotation couldn't be removed");
+                    }
+                } catch (Exception e1) {
+                    e1.printStackTrace();
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
         }
