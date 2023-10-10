@@ -81,6 +81,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @EActivity(R.layout.activity_main)
@@ -110,8 +111,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     String pdfFileName;
 
     private Uri currUri = null;
-    private String currFileName;
-    private String currFilePath;
 
 
     @OptionsItem(R.id.pickFile)
@@ -174,10 +173,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     private void displayFileFromUri() {
 
         if (currUri == null) {
-            Toast.makeText(this, "currUri is null", Toast.LENGTH_SHORT).show();
+            DebugUtilKt.toast(this,"currUri is null");
             return;
         }
-
 
         // TODO: 1/17/21  DON NOT FORGET TO USE YOUR FILE HANDLING SCENARIO FOR NEW ANDROID APIs
 
@@ -194,8 +192,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
         pdfFileName = getFileName(currUri);
 
-        this.currFilePath = UriUtils.getPathFromUri(this, currUri);
-        this.currFileName = pdfFileName;
+//        String currFilePath = UriUtils.getPathFromUri(this, currUri);
+//        String currFileName = pdfFileName;
 
         this.configurator = pdfView.fromUri(currUri)
                 .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
@@ -462,7 +460,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     }
 
     public void showSnackbar(String referenceHash) {
-        String message = "Clicked: " + referenceHash;
+        String message = "Annotation with " + referenceHash;
         Snackbar snackbar = Snackbar.make(pdfView, message, Snackbar.LENGTH_LONG);
         snackbar.setAction("Delete", v -> deleteAnnotation(referenceHash));
         snackbar.show();
@@ -470,7 +468,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     public void deleteAnnotation(String referenceHash) {
         try {
-            // PDFDrawer.removeAllAnnotation(filePath, pdfView.getCurrentPage());
             String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
             removeOCG(filePath, referenceHash);
             configurator.refresh(pdfView.getCurrentPage()); // refresh view
@@ -485,9 +482,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "onTap --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
 
-//        // check zoom and scale
-//        Log.i(TAG, "zoom --> " + pdfView.getZoom() + " | scale " + pdfView.getScaleX() + " , " + pdfView.getScaleY());
-//        Log.i(TAG, "--------------------------------------------------");
+        // check zoom and scale
+        Log.i(TAG, "zoom --> " + pdfView.getZoom() + " | scale " + pdfView.getScaleX() + " , " + pdfView.getScaleY());
+        Log.i(TAG, "--------------------------------------------------");
 
         return false;
     }
@@ -500,6 +497,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     @Override
     public void onError(Throwable t) {
-        DebugUtilKt.toast(this, t.getMessage());
+        DebugUtilKt.toast(this, Objects.requireNonNull(t.getMessage()));
     }
 }
