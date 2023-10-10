@@ -91,10 +91,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     private static final String TAG = PDFViewActivity.class.getSimpleName();
 
-    private final static int REQUEST_CODE = 42;
     public static final int PERMISSION_CODE = 42042;
-
-    public static final String SAMPLE_FILE = "foo.pdf";
     public static final String READ_EXTERNAL_STORAGE = "android.permission.READ_EXTERNAL_STORAGE";
 
     PDFView.Configurator configurator = null;
@@ -221,14 +218,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     public String getFileName(Uri uri) {
         String result = null;
         if (uri.getScheme().equals("content")) {
-            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
-            try {
+            try (Cursor cursor = getContentResolver().query(uri, null, null, null, null)) {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
-                }
-            } finally {
-                if (cursor != null) {
-                    cursor.close();
                 }
             }
         }

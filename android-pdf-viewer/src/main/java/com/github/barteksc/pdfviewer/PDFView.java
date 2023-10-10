@@ -1681,8 +1681,7 @@ public class PDFView extends RelativeLayout {
         }
 
         public Configurator disableLongpress() {
-            // todo :add
-//            PDFView.this.dragPinchManager.disableLongpress();
+            PDFView.this.dragPinchManager.disableLongpress();
             return this;
         }
 
