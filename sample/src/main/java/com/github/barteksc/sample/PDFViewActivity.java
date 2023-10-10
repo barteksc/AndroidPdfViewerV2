@@ -40,6 +40,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
+import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
 import com.github.barteksc.pdfviewer.annotation.ocg.OCGRemover;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
@@ -286,131 +287,19 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // here we have a long click
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
-        try {
-            addAnnotation(e);
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
-    public void addAnnotation(MotionEvent e) throws IOException {
-
-        // Generate reference hash
-        String referenceHash = new StringBuilder()
-                .append(PublicValue.KEY_REFERENCE_HASH)
-                .append(UUID.randomUUID().toString())
-                .toString();
-
-        // Get image marker
-        byte[] OCGCover = PublicFunction.Companion.getByteFromDrawable(PDFViewActivity.this, R.drawable.marker);
-
-        String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
-
-        PointF pointF = pdfView.convertScreenPintsToPdfCoordinates(e);
-
-        new Handler().post(() -> {
-            // Code here will run in UI thread
-            try {
-                boolean isAdded = addOCG(pointF, filePath, pdfView.getCurrentPage(), referenceHash, OCGCover, 0, 0);
-                Log.d(TAG, "addAnnotation: isAdded = " + isAdded);
-
-                if (isAdded) {
-                    configurator.refresh(pdfView.getCurrentPage()); // refresh view
-                } else {
-                    DebugUtilKt.toast(this, "Annotation couldn't be added");
+            new Handler().post(() -> {
+                try {
+                   boolean isAdded = AnnotationManager.addAnnotation(this, e, currUri, pdfView);
+                    if (isAdded) {
+                        configurator.refresh(pdfView.getCurrentPage());// refresh view
+                    } else {
+                        Toast.makeText(this, "Annotation couldn't be added", Toast.LENGTH_LONG).show();
+                    }
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
                 }
-//                    MagicalPdfCore.getInstance().addOCG(pointF, filePath, currPage, referenceHash, OCGCover, OCGWidth, OCGHeight);
-//                    MagicalPECViewModel.this.pecCoreStatus.postValue(PECCoreStatusEnum.SUCCESS);
-            } catch (Exception e1) {
-//                    MagicalPECViewModel.this.pecCoreStatus.postValue(PECCoreStatusEnum.FAILED);
-                e1.printStackTrace();
-            }
-        });
 
-    }
-
-    public boolean addOCG(PointF pointF, String filePath, int currPage, String referenceHash, byte[] OCGCover, float OCGWidth, float OCGHeight) throws Exception {
-
-        // Hint: OCG -> optional content group
-        // Hint: Page Starts From --> 1 In OpenPdf Core
-        currPage++;
-
-        // OCG width & height
-        if (OCGWidth == 0 || OCGHeight == 0) {
-            OCGWidth = PublicValue.DEFAULT_OCG_WIDTH;
-            OCGHeight = PublicValue.DEFAULT_OCG_HEIGHT;
-        }
-
-        // get file and FileOutputStream
-        if (filePath == null || filePath.isEmpty())
-            throw new Exception("Input file is empty");
-
-        File file = new File(filePath);
-
-        if (!file.exists())
-            throw new Exception("Input file does not exists");
-
-        try {
-
-            // inout stream from file
-            InputStream inputStream = new FileInputStream(file);
-
-            // we create a reader for a certain document
-            PdfReader reader = new PdfReader(inputStream);
-
-            // we create a stamper that will copy the document to a new file
-            PdfStamper stamp = new PdfStamper(reader, new FileOutputStream(file));
-
-            // get watermark icon
-            Image img = Image.getInstance(OCGCover);
-            img.setAnnotation(new Annotation(0, 0, 0, 0, referenceHash));
-            img.scaleAbsolute(OCGWidth, OCGHeight);
-            img.setAbsolutePosition(pointF.x, pointF.y);
-            PdfImage stream = new PdfImage(img, referenceHash, null);
-            stream.put(new PdfName(PublicValue.KEY_SPECIAL_ID), new PdfName(referenceHash));
-            PdfIndirectObject ref = stamp.getWriter().addToBody(stream);
-            img.setDirectReference(ref.getIndirectReference());
-
-            // add as layer
-            PdfLayer wmLayer = new PdfLayer(referenceHash, stamp.getWriter());
-
-            // prepare transparency
-            PdfGState transparent = new PdfGState();
-            transparent.setAlphaIsShape(false);
-
-            // get page file number count
-            if (reader.getNumberOfPages() < currPage) {
-                stamp.close();
-                reader.close();
-                throw new Exception("Page index is out of pdf file page numbers");
-            }
-
-            // add annotation into target page
-            PdfContentByte over = stamp.getOverContent(currPage);
-            if (over == null) {
-                stamp.close();
-                reader.close();
-                throw new Exception("GetUnderContent() is null");
-            }
-
-            // add as layer
-            over.beginLayer(wmLayer);
-            over.setGState(transparent); // set block transparency properties
-            over.addImage(img);
-            over.endLayer();
-
-            // closing PdfStamper will generate the new PDF file
-            stamp.close();
-
-            // close reader
-            reader.close();
-
-            // finish method
-            return true;
-
-        } catch (Exception ex) {
-            throw new Exception(ex.getMessage());
-        }
+            });
     }
 
     public boolean removeOCG(String filePath, String annotationHash) throws Exception {
