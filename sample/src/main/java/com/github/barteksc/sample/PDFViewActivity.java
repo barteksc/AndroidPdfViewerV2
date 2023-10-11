@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,7 +40,6 @@ import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
-import com.github.barteksc.pdfviewer.annotation.ocg.OCGRemover;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -52,20 +50,8 @@ import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.github.barteksc.pdfviewer.util.DebugUtilKt;
-import com.github.barteksc.pdfviewer.util.PublicFunction;
 import com.github.barteksc.pdfviewer.util.PublicValue;
-import com.github.barteksc.pdfviewer.util.UriUtils;
 import com.google.android.material.snackbar.Snackbar;
-import com.lowagie.text.Annotation;
-import com.lowagie.text.Image;
-import com.lowagie.text.pdf.PdfContentByte;
-import com.lowagie.text.pdf.PdfGState;
-import com.lowagie.text.pdf.PdfImage;
-import com.lowagie.text.pdf.PdfIndirectObject;
-import com.lowagie.text.pdf.PdfLayer;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -76,14 +62,9 @@ import org.androidannotations.annotations.ViewById;
 import org.benjinus.pdfium.Bookmark;
 import org.benjinus.pdfium.Meta;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @EActivity(R.layout.activity_main)
 @OptionsMenu(R.menu.options)
@@ -302,76 +283,24 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
             });
     }
 
-    public boolean removeOCG(String filePath, String annotationHash) throws Exception {
-
-        // get file and FileOutputStream
-        if (filePath == null || filePath.isEmpty())
-            throw new Exception("Input file is empty");
-
-        File file = new File(filePath);
-
-        if (!file.exists())
-            throw new Exception("Input file does not exists");
-
-        try {
-
-            // inout stream from file
-            InputStream inputStream = new FileInputStream(file);
-
-            // we create a reader for a certain document
-            PdfReader pdfReader = new PdfReader(inputStream);
-
-            // we create a stamper that will copy the document to a new file
-            PdfStamper pdfStamper = new PdfStamper(pdfReader, new FileOutputStream(file));
-
-            // remove target object
-            OCGRemover ocgRemover = new OCGRemover();
-            ocgRemover.removeLayers(pdfReader, annotationHash);
-
-            // closing PdfStamper will generate the new PDF file
-            pdfStamper.close();
-
-            // close reader
-            pdfReader.close();
-
-            // finish method
-            return true;
-
-        } catch (Exception e) {
-            throw new Exception(e.getMessage());
-        }
-    }
-
     public void showSnackbar(String referenceHash) {
         String message = "Annotation with " + referenceHash;
         Snackbar snackbar = Snackbar.make(pdfView, message, Snackbar.LENGTH_LONG);
-        snackbar.setAction("Delete", v -> deleteAnnotation(referenceHash));
-        snackbar.show();
-    }
-
-    public void deleteAnnotation(String referenceHash) {
-        try {
-            String filePath = UriUtils.getPathFromUri(PDFViewActivity.this, currUri);
-
-            new Handler().post(() -> {
-                // Code here will run in UI thread
-                try {
-                    boolean isRemoved = removeOCG(filePath, referenceHash);
-
+        snackbar.setAction("Delete", v -> new Handler().post(() -> {
+            try {
+                boolean isRemoved =  AnnotationManager.deleteAnnotation(this, currUri, referenceHash);
+                if(isRemoved){
+                    configurator.refresh(pdfView.getCurrentPage()); // refresh view
                     Log.d(TAG, "deleteAnnotation: isDeleted = " + isRemoved);
-
-                    if (isRemoved) {
-                        configurator.refresh(pdfView.getCurrentPage()); // refresh view
-                    } else {
-                        DebugUtilKt.toast(this, "Annotation couldn't be removed");
-                    }
-                } catch (Exception e1) {
-                    e1.printStackTrace();
                 }
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                else {
+                    DebugUtilKt.toast(this, "Annotation couldn't be removed");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }));
+        snackbar.show();
     }
 
     @Override

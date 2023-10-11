@@ -6,6 +6,7 @@ import android.net.Uri
 import android.view.MotionEvent
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.R
+import com.github.barteksc.pdfviewer.annotation.ocg.OCGRemover
 import com.github.barteksc.pdfviewer.util.PublicFunction.Companion.getByteFromDrawable
 import com.github.barteksc.pdfviewer.util.PublicValue
 import com.github.barteksc.pdfviewer.util.UriUtils
@@ -28,7 +29,6 @@ import java.util.UUID
 object AnnotationManager {
     val TAG = AnnotationManager.javaClass.simpleName
 
-
     @Throws(IOException::class)
     @JvmStatic
     fun addAnnotation(context: Context, e: MotionEvent?, currUri: Uri, pdfView: PDFView): Boolean {
@@ -44,7 +44,7 @@ object AnnotationManager {
         val filePath = UriUtils.getPathFromUri(context, currUri)
         val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
 
-        var isAdded = false;
+        var isAdded = false
         try {
             isAdded =
                 addOCG(
@@ -61,6 +61,20 @@ object AnnotationManager {
             e1.printStackTrace()
         }
         return isAdded
+    }
+
+    @Throws(IOException::class)
+    @JvmStatic
+    fun deleteAnnotation(context: Context, currUri: Uri, referenceHash: String?): Boolean {
+        var isRemoved = false
+        try {
+            val filePath = UriUtils.getPathFromUri(context, currUri)
+            isRemoved = removeOCG(filePath, referenceHash)
+            logDebug(TAG, "deleteAnnotation: isDeleted = $isRemoved")
+        } catch (e1: java.lang.Exception) {
+            e1.printStackTrace()
+        }
+        return isRemoved
     }
 
     @Throws(java.lang.Exception::class)
@@ -151,6 +165,41 @@ object AnnotationManager {
             true
         } catch (ex: java.lang.Exception) {
             throw java.lang.Exception(ex.message)
+        }
+    }
+
+    @Throws(java.lang.Exception::class)
+    fun removeOCG(filePath: String?, annotationHash: String?): Boolean {
+
+        // get file and FileOutputStream
+        if (filePath == null || filePath.isEmpty()) throw java.lang.Exception("Input file is empty")
+        val file = File(filePath)
+        if (!file.exists()) throw java.lang.Exception("Input file does not exists")
+        return try {
+
+            // inout stream from file
+            val inputStream: InputStream = FileInputStream(file)
+
+            // we create a reader for a certain document
+            val pdfReader = PdfReader(inputStream)
+
+            // we create a stamper that will copy the document to a new file
+            val pdfStamper = PdfStamper(pdfReader, FileOutputStream(file))
+
+            // remove target object
+            val ocgRemover = OCGRemover()
+            ocgRemover.removeLayers(pdfReader, annotationHash)
+
+            // closing PdfStamper will generate the new PDF file
+            pdfStamper.close()
+
+            // close reader
+            pdfReader.close()
+
+            // finish method
+            true
+        } catch (e: java.lang.Exception) {
+            throw java.lang.Exception(e.message)
         }
     }
 }
