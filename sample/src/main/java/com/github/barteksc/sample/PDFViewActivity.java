@@ -276,6 +276,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                     } else {
                         Toast.makeText(this, "Annotation couldn't be added", Toast.LENGTH_LONG).show();
                     }
+                    DebugUtilKt.logInfo(TAG, "addAnnotation: isAdded = " + isAdded);
                 } catch (IOException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -288,14 +289,14 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Snackbar snackbar = Snackbar.make(pdfView, message, Snackbar.LENGTH_LONG);
         snackbar.setAction("Delete", v -> new Handler().post(() -> {
             try {
-                boolean isRemoved =  AnnotationManager.deleteAnnotation(this, currUri, referenceHash);
+                boolean isRemoved =  AnnotationManager.removeAnnotation(this, currUri, referenceHash);
                 if(isRemoved){
                     configurator.refresh(pdfView.getCurrentPage()); // refresh view
-                    Log.d(TAG, "deleteAnnotation: isDeleted = " + isRemoved);
                 }
                 else {
                     DebugUtilKt.toast(this, "Annotation couldn't be removed");
                 }
+                DebugUtilKt.logInfo(TAG, "removeAnnotation: isRemoved = " + isRemoved);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }

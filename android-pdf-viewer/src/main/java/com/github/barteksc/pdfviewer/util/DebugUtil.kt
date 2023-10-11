@@ -13,6 +13,10 @@ fun logDebug(tag:String = "" , text:String){
     Log.d(tag, text)
 }
 
+fun logInfo(tag:String = "" , text:String){
+    Log.i(tag, text)
+}
+
 fun logError(tag:String = "" , text:String){
     Log.e(tag, text)
 }

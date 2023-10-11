@@ -11,6 +11,7 @@ import com.github.barteksc.pdfviewer.util.PublicFunction.Companion.getByteFromDr
 import com.github.barteksc.pdfviewer.util.PublicValue
 import com.github.barteksc.pdfviewer.util.UriUtils
 import com.github.barteksc.pdfviewer.util.logDebug
+import com.github.barteksc.pdfviewer.util.logInfo
 import com.lowagie.text.Annotation
 import com.lowagie.text.Image
 import com.lowagie.text.pdf.PdfGState
@@ -56,7 +57,7 @@ object AnnotationManager {
                     0f,
                     0f
                 )
-            logDebug(TAG, "addAnnotation: isAdded = $isAdded")
+            logInfo(TAG, "addAnnotation: isAdded = $isAdded")
         } catch (e1: Exception) {
             e1.printStackTrace()
         }
@@ -65,12 +66,12 @@ object AnnotationManager {
 
     @Throws(IOException::class)
     @JvmStatic
-    fun deleteAnnotation(context: Context, currUri: Uri, referenceHash: String?): Boolean {
+    fun removeAnnotation(context: Context, currUri: Uri, referenceHash: String?): Boolean {
         var isRemoved = false
         try {
             val filePath = UriUtils.getPathFromUri(context, currUri)
             isRemoved = removeOCG(filePath, referenceHash)
-            logDebug(TAG, "deleteAnnotation: isDeleted = $isRemoved")
+            logInfo(TAG, "removeAnnotation: isRemoved = $isRemoved")
         } catch (e1: java.lang.Exception) {
             e1.printStackTrace()
         }
