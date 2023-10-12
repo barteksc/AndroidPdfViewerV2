@@ -10,7 +10,6 @@ import com.github.barteksc.pdfviewer.annotation.ocg.OCGRemover
 import com.github.barteksc.pdfviewer.util.PublicFunction.Companion.getByteFromDrawable
 import com.github.barteksc.pdfviewer.util.PublicValue
 import com.github.barteksc.pdfviewer.util.UriUtils
-import com.github.barteksc.pdfviewer.util.logDebug
 import com.github.barteksc.pdfviewer.util.logInfo
 import com.lowagie.text.Annotation
 import com.lowagie.text.Image
@@ -41,7 +40,7 @@ object AnnotationManager {
             .toString()
 
         // Get image marker
-        val OCGCover = getByteFromDrawable(context, R.drawable.marker)
+        val OCGCover = getByteFromDrawable(context, R.drawable.annotation_marker)
         val filePath = UriUtils.getPathFromUri(context, currUri)
         val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
 
