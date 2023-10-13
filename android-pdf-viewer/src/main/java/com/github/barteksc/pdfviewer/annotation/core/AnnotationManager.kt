@@ -40,7 +40,7 @@ object AnnotationManager {
             .toString()
 
         // Get image marker
-        val OCGCover = getByteFromDrawable(context, R.drawable.annotation_marker)
+        val OCGCover = getByteFromDrawable(context, R.drawable.annotation_circle)
         val filePath = UriUtils.getPathFromUri(context, currUri)
         val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
 
