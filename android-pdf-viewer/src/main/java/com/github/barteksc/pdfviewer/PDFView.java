@@ -469,8 +469,7 @@ public class PDFView extends RelativeLayout {
         waitingDocumentConfigurator = null;
 
         animationManager.stopAll();
-        //todo:enable
-//        dragPinchManager.disable();
+        dragPinchManager.disable();
 
         // Stop tasks
         if (renderingHandler != null) {

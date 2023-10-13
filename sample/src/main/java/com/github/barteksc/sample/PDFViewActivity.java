@@ -187,6 +187,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 .onPageError(this)
                 .onTap(this)
                 .onLongPress(this)
+                .onError(this)
                 .linkHandler(this);
 
         this.configurator.load();
@@ -272,15 +273,16 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
-                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView, pdfView.getCurrentPage());
-//                   boolean isAdded = AnnotationManager.addAnnotation(this, e, currUri, pdfView);
+                boolean isAdded = AnnotationManager.addLineAnnotation(this, currUri);
+//                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView, pdfView.getCurrentPage());
+//                   boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
                 if (isAdded) {
                     configurator.refresh(pdfView.getCurrentPage());// refresh view
                 } else {
                     Toast.makeText(this, "Annotation couldn't be added", Toast.LENGTH_LONG).show();
                 }
                 DebugUtilKt.logInfo(TAG, "addAnnotation: isAdded = " + isAdded);
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
 

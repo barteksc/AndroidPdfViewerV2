@@ -12,6 +12,8 @@ import com.github.barteksc.pdfviewer.util.PublicValue
 import com.github.barteksc.pdfviewer.util.UriUtils
 import com.github.barteksc.pdfviewer.util.logInfo
 import com.lowagie.text.Annotation
+import com.lowagie.text.Document
+import com.lowagie.text.DocumentException
 import com.lowagie.text.Element
 import com.lowagie.text.Image
 import com.lowagie.text.pdf.BaseFont
@@ -22,6 +24,7 @@ import com.lowagie.text.pdf.PdfLayer
 import com.lowagie.text.pdf.PdfName
 import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfStamper
+import com.lowagie.text.pdf.PdfWriter
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -33,11 +36,18 @@ import java.util.UUID
 
 object AnnotationManager {
     val TAG = AnnotationManager.javaClass.simpleName
+    // TODO: extract file check in a function
 
     /** Adds text to the PDF document. Will need reference hash for identification */
     @Throws(FileNotFoundException::class, IOException::class)
     @JvmStatic
-    fun addTextAnnotation(context:Context, e: MotionEvent, currUri: Uri, pdfView: PDFView, page: Int): Boolean {
+    fun addTextAnnotation(
+        context: Context,
+        e: MotionEvent,
+        currUri: Uri,
+        pdfView: PDFView,
+        page: Int
+    ): Boolean {
         // Hint: Page Starts From --> 1 In OpenPdf Core
         var page = page
         page++
@@ -57,7 +67,7 @@ object AnnotationManager {
 
             // we create a reader for a certain document
             val reader = PdfReader(inputStream)
-            
+
             // we create a stamper that will copy the document to a new file
             val stamp = PdfStamper(reader, FileOutputStream(file))
 
@@ -93,7 +103,12 @@ object AnnotationManager {
     /** Adds default image marker to the PDF document */
     @Throws(IOException::class)
     @JvmStatic
-    fun addImageAnnotation(context: Context, e: MotionEvent?, currUri: Uri, pdfView: PDFView): Boolean {
+    fun addImageAnnotation(
+        context: Context,
+        e: MotionEvent?,
+        currUri: Uri,
+        pdfView: PDFView
+    ): Boolean {
 
         // Generate reference hash
         val referenceHash = StringBuilder()
@@ -138,6 +153,61 @@ object AnnotationManager {
             e1.printStackTrace()
         }
         return isRemoved
+    }
+
+    /** Replaces the current document with document that contains a dashed line - WIP
+     *  TODO: Add the lines to the original document, instead of replacing it, use MotionEvent's coordinates, add id/reference hash
+     *  */
+
+    @Throws(java.lang.Exception::class)
+    @JvmStatic
+    fun addLineAnnotation(
+        context: Context,
+        currUri: Uri,
+    ): Boolean {
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+
+        if (filePath.isNullOrEmpty()) throw java.lang.Exception("Input file is empty")
+        val file = File(filePath)
+        if (!file.exists()) throw java.lang.Exception("Input file does not exists")
+        val fileOutputStream = FileOutputStream(file, true)
+
+        // step 1: creation of a document-object
+        val document = Document()
+        return try {
+
+            // step 2: creation of the writer
+            val writer = PdfWriter.getInstance(document, fileOutputStream)
+
+            // step 3: we open the document
+            document.open()
+
+            // step 4: we grab the ContentByte and do some stuff with it
+            val cb = writer.directContent
+            cb.setRGBColorStroke(0, 0, 255)
+
+            // first we draw some lines to be able to visualize the text alignment functions
+            cb.setLineWidth(0f)
+            cb.moveTo(250f, 500f)
+            cb.lineTo(255f, 500f)
+            cb.moveTo(260f, 500f)
+            cb.lineTo(265f, 500f)
+            cb.moveTo(270f, 500f)
+            cb.lineTo(275f, 500f)
+            cb.stroke()
+
+            cb.sanityCheck()
+            true
+        } catch (de: DocumentException) {
+            System.err.println(de.message)
+            false
+        } catch (de: IOException) {
+            System.err.println(de.message)
+            false
+        } finally {
+            // step 5: we close the document
+            document.close()
+        }
     }
 
     @Throws(java.lang.Exception::class)
