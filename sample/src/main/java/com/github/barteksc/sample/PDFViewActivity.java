@@ -50,6 +50,7 @@ import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.github.barteksc.pdfviewer.util.DebugUtilKt;
+import com.github.barteksc.pdfviewer.util.PublicFunction;
 import com.github.barteksc.pdfviewer.util.PublicValue;
 import com.github.barteksc.pdfviewer.util.UriUtils;
 import com.google.android.material.snackbar.Snackbar;
@@ -269,13 +270,16 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     @Override
     public void onLongPress(MotionEvent e) {
         // here we have a long click
+
+        byte[] OCGCover = PublicFunction.Companion.getByteFromDrawable(this, R.drawable.annotation_marker);
+
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
-                boolean isAdded = AnnotationManager.addLineAnnotation(this, currUri);
+//                boolean isAdded = AnnotationManager.addLineAnnotation(this, currUri);
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView, pdfView.getCurrentPage());
-//                   boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
+                   boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView, OCGCover);
                 if (isAdded) {
                     configurator.refresh(pdfView.getCurrentPage());// refresh view
                 } else {
