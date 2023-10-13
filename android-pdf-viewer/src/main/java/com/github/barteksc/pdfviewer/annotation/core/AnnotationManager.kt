@@ -57,10 +57,7 @@ object AnnotationManager {
 
             // we create a reader for a certain document
             val reader = PdfReader(inputStream)
-
-            // get page file number count
-            val pageNumbers = reader.numberOfPages
-
+            
             // we create a stamper that will copy the document to a new file
             val stamp = PdfStamper(reader, FileOutputStream(file))
 
@@ -75,7 +72,7 @@ object AnnotationManager {
             // Setting blue as default
             over.setRGBColorFill(0, 0, 255)
             over.setTextMatrix(30f, 30f)
-            over.showText("page $page")
+
             over.setFontAndSize(bf, 32f)
 
             val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
