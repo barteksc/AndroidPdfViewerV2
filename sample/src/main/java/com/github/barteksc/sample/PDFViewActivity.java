@@ -51,6 +51,7 @@ import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
 import com.github.barteksc.pdfviewer.util.DebugUtilKt;
 import com.github.barteksc.pdfviewer.util.PublicValue;
+import com.github.barteksc.pdfviewer.util.UriUtils;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.androidannotations.annotations.AfterViews;
@@ -90,6 +91,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     String pdfFileName;
 
     private Uri currUri = null;
+    private String currFilePath = null;
 
 
     @OptionsItem(R.id.pickFile)
@@ -171,7 +173,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
         pdfFileName = getFileName(currUri);
 
-//        String currFilePath = UriUtils.getPathFromUri(this, currUri);
+        currFilePath = UriUtils.getPathFromUri(this, currUri);
 //        String currFileName = pdfFileName;
 
         this.configurator = pdfView.fromUri(currUri)
@@ -268,20 +270,21 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // here we have a long click
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
-            new Handler().post(() -> {
-                try {
-                   boolean isAdded = AnnotationManager.addAnnotation(this, e, currUri, pdfView);
-                    if (isAdded) {
-                        configurator.refresh(pdfView.getCurrentPage());// refresh view
-                    } else {
-                        Toast.makeText(this, "Annotation couldn't be added", Toast.LENGTH_LONG).show();
-                    }
-                    DebugUtilKt.logInfo(TAG, "addAnnotation: isAdded = " + isAdded);
-                } catch (IOException ex) {
-                    throw new RuntimeException(ex);
+        new Handler().post(() -> {
+            try {
+                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView, pdfView.getCurrentPage());
+//                   boolean isAdded = AnnotationManager.addAnnotation(this, e, currUri, pdfView);
+                if (isAdded) {
+                    configurator.refresh(pdfView.getCurrentPage());// refresh view
+                } else {
+                    Toast.makeText(this, "Annotation couldn't be added", Toast.LENGTH_LONG).show();
                 }
+                DebugUtilKt.logInfo(TAG, "addAnnotation: isAdded = " + isAdded);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
 
-            });
+        });
     }
 
     public void showSnackbar(String referenceHash) {
@@ -289,11 +292,10 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Snackbar snackbar = Snackbar.make(pdfView, message, Snackbar.LENGTH_LONG);
         snackbar.setAction("Delete", v -> new Handler().post(() -> {
             try {
-                boolean isRemoved =  AnnotationManager.removeAnnotation(this, currUri, referenceHash);
-                if(isRemoved){
+                boolean isRemoved = AnnotationManager.removeAnnotation(this, currUri, referenceHash);
+                if (isRemoved) {
                     configurator.refresh(pdfView.getCurrentPage()); // refresh view
-                }
-                else {
+                } else {
                     DebugUtilKt.toast(this, "Annotation couldn't be removed");
                 }
                 DebugUtilKt.logInfo(TAG, "removeAnnotation: isRemoved = " + isRemoved);

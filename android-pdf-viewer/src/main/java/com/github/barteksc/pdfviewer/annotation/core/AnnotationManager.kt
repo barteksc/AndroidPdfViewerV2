@@ -12,7 +12,10 @@ import com.github.barteksc.pdfviewer.util.PublicValue
 import com.github.barteksc.pdfviewer.util.UriUtils
 import com.github.barteksc.pdfviewer.util.logInfo
 import com.lowagie.text.Annotation
+import com.lowagie.text.Element
 import com.lowagie.text.Image
+import com.lowagie.text.pdf.BaseFont
+import com.lowagie.text.pdf.PdfContentByte
 import com.lowagie.text.pdf.PdfGState
 import com.lowagie.text.pdf.PdfImage
 import com.lowagie.text.pdf.PdfLayer
@@ -21,17 +24,79 @@ import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfStamper
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.util.UUID
 
+
 object AnnotationManager {
     val TAG = AnnotationManager.javaClass.simpleName
 
+    /** Adds text to the PDF document. Will need reference hash for identification */
+    @Throws(FileNotFoundException::class, IOException::class)
+    @JvmStatic
+    fun addTextAnnotation(context:Context, e: MotionEvent, currUri: Uri, pdfView: PDFView, page: Int): Boolean {
+        // Hint: Page Starts From --> 1 In OpenPdf Core
+        var page = page
+        page++
+
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+
+        // get file and FileOutputStream
+        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
+        val file = File(filePath)
+        if (!file.exists()) throw FileNotFoundException()
+
+        var isAdded = false
+        try {
+
+            // inout stream from file
+            val inputStream: InputStream = FileInputStream(file)
+
+            // we create a reader for a certain document
+            val reader = PdfReader(inputStream)
+
+            // get page file number count
+            val pageNumbers = reader.numberOfPages
+
+            // we create a stamper that will copy the document to a new file
+            val stamp = PdfStamper(reader, FileOutputStream(file))
+
+            // create base font for text
+            val bf = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.WINANSI, BaseFont.EMBEDDED)
+
+            // text over the existing page
+            val over: PdfContentByte = stamp.getOverContent(page)
+            over.beginText()
+            over.setFontAndSize(bf, 18f)
+
+            // Setting blue as default
+            over.setRGBColorFill(0, 0, 255)
+            over.setTextMatrix(30f, 30f)
+            over.showText("page $page")
+            over.setFontAndSize(bf, 32f)
+
+            val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
+
+            over.showTextAligned(Element.ALIGN_LEFT, "Hello VDS", pointF.x, pointF.y, 0f)
+            over.endText()
+
+            // closing PdfStamper will generate the new PDF file
+            stamp.close()
+
+            isAdded = true
+        } catch (de: java.lang.Exception) {
+            de.printStackTrace()
+        }
+        return isAdded
+    }
+
+    /** Adds default image marker to the PDF document */
     @Throws(IOException::class)
     @JvmStatic
-    fun addAnnotation(context: Context, e: MotionEvent?, currUri: Uri, pdfView: PDFView): Boolean {
+    fun addImageAnnotation(context: Context, e: MotionEvent?, currUri: Uri, pdfView: PDFView): Boolean {
 
         // Generate reference hash
         val referenceHash = StringBuilder()
@@ -63,6 +128,7 @@ object AnnotationManager {
         return isAdded
     }
 
+    /** Removes annotation from the PDF document. Currently removes only image annotations */
     @Throws(IOException::class)
     @JvmStatic
     fun removeAnnotation(context: Context, currUri: Uri, referenceHash: String?): Boolean {
