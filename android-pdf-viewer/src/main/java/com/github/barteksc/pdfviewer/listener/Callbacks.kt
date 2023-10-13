@@ -33,7 +33,7 @@ class Callbacks {
     /**
      * Call back object to call when document loading error occurs
      */
-    var onError: OnErrorListener? = null
+    private var onErrorListener: OnErrorListener? = null
 
     /**
      * Call back object to call when the page load error occurs
@@ -58,8 +58,9 @@ class Callbacks {
     /**
      * Call back object to call when the above layer is to drawn
      */
-    var onDraw: OnDrawListener? = null
-    var onDrawAll: OnDrawListener? = null
+    private var onDrawListener: OnDrawListener? = null
+
+    private var onDrawAllListener: OnDrawListener? = null
 
     /**
      * Call back object to call when the user does a tap gesture
@@ -75,6 +76,7 @@ class Callbacks {
      * Call back object to call when clicking link
      */
     private var linkHandler: LinkHandler? = null
+
     fun setOnLoadComplete(onLoadCompleteListener: OnLoadCompleteListener?) {
         this.onLoadCompleteListener = onLoadCompleteListener
     }
@@ -83,6 +85,14 @@ class Callbacks {
         if (onLoadCompleteListener != null) {
             onLoadCompleteListener!!.loadComplete(pagesCount)
         }
+    }
+
+    fun setOnError(onErrorListener: OnErrorListener?) {
+        this.onErrorListener = onErrorListener
+    }
+
+    fun getOnError(): OnErrorListener? {
+        return onErrorListener
     }
 
     fun setOnPageError(onPageErrorListener: OnPageErrorListener?) {
@@ -125,6 +135,22 @@ class Callbacks {
         if (onPageScrollListener != null) {
             onPageScrollListener!!.onPageScrolled(currentPage, offset)
         }
+    }
+
+    fun setOnDraw(onDrawListener: OnDrawListener?) {
+        this.onDrawListener = onDrawListener
+    }
+
+    fun getOnDraw(): OnDrawListener? {
+        return onDrawListener
+    }
+
+    fun setOnDrawAll(onDrawAllListener: OnDrawListener?) {
+        this.onDrawAllListener = onDrawAllListener
+    }
+
+    fun getOnDrawAll(): OnDrawListener? {
+        return onDrawAllListener
     }
 
     fun setOnTap(onTapListener: OnTapListener?) {
