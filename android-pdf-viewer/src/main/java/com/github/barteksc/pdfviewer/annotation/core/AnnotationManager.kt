@@ -117,7 +117,7 @@ object AnnotationManager {
             .toString()
 
         // Get image marker
-        val OCGCover = getByteFromDrawable(context, R.drawable.annotation_marker)
+        val OCGCover = getByteFromDrawable(context, R.drawable.annotation_circle)
         val filePath = UriUtils.getPathFromUri(context, currUri)
         val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
 
@@ -253,6 +253,7 @@ object AnnotationManager {
             // get watermark icon
             val img = Image.getInstance(OCGCover)
             img.annotation = Annotation(0f, 0f, 0f, 0f, referenceHash)
+            img.transparency = intArrayOf(0x00, 0x10)
             img.scaleAbsolute(OCGWidth, OCGHeight)
             img.setAbsolutePosition(pointF.x, pointF.y)
             val stream = PdfImage(img, referenceHash, null)
