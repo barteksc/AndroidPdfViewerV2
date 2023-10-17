@@ -155,6 +155,66 @@ object AnnotationManager {
         return isRemoved
     }
 
+    /** Adds circle to the PDF document. Will need reference hash for identification */
+    @Throws(FileNotFoundException::class, IOException::class)
+    @JvmStatic
+    fun addCircle(
+        context: Context,
+        e: MotionEvent,
+        currUri: Uri,
+        pdfView: PDFView,
+        page: Int
+    ): Boolean {
+        // Hint: Page Starts From --> 1 In OpenPdf Core
+        var page = page
+        page++
+
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+
+        // get file and FileOutputStream
+        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
+        val file = File(filePath)
+        if (!file.exists()) throw FileNotFoundException()
+
+        var isAdded = false
+        try {
+            // input stream from file
+            val inputStream: InputStream = FileInputStream(file)
+
+            // we create a reader for a certain document
+            val reader = PdfReader(inputStream)
+
+            // we create a stamper that will copy the document to a new file
+            val stamp = PdfStamper(reader, FileOutputStream(file))
+
+            // content over the existing page
+            val over: PdfContentByte = stamp.getOverContent(page)
+
+            // default blue
+            over.setRGBColorStroke(0, 0, 255)
+
+            val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
+
+            over.circle(pointF.x, pointF.y, 30F)
+            over.stroke()
+
+            // todo: Add reference hash
+            // add as layer
+            val wmLayer = PdfLayer("circle-referenceHash", stamp.writer)
+            over.beginLayer(wmLayer)
+            over.endLayer()
+
+            // closing PdfStamper will generate the new PDF file
+            stamp.close()
+            over.sanityCheck()
+
+            isAdded = true
+        } catch (de: java.lang.Exception) {
+            de.printStackTrace()
+        }
+        return isAdded
+    }
+
     /** Replaces the current document with document that contains a dashed line - WIP
      *  TODO: Add the lines to the original document, instead of replacing it, use MotionEvent's coordinates, add id/reference hash
      *  */
