@@ -127,7 +127,7 @@ object AnnotationManager {
                 addOCG(
                     pointF,
                     filePath,
-                    pdfView.getCurrentPage(),
+                    pdfView.currentPage,
                     referenceHash,
                     OCGCover,
                     0f,
@@ -163,10 +163,9 @@ object AnnotationManager {
         e: MotionEvent,
         currUri: Uri,
         pdfView: PDFView,
-        page: Int
     ): Boolean {
         // Hint: Page Starts From --> 1 In OpenPdf Core
-        var page = page
+        var page = pdfView.currentPage
         page++
 
         val filePath = UriUtils.getPathFromUri(context, currUri)
@@ -223,10 +222,9 @@ object AnnotationManager {
         e: MotionEvent,
         currUri: Uri,
         pdfView: PDFView,
-        page: Int
     ): Boolean {
         // Hint: Page Starts From --> 1 In OpenPdf Core
-        var page = page
+        var page = pdfView.currentPage
         page++
 
         val filePath = UriUtils.getPathFromUri(context, currUri)
