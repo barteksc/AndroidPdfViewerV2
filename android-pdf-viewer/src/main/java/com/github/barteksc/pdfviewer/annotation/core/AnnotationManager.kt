@@ -12,11 +12,14 @@ import com.github.barteksc.pdfviewer.util.PublicValue
 import com.github.barteksc.pdfviewer.util.UriUtils
 import com.github.barteksc.pdfviewer.util.logInfo
 import com.lowagie.text.Annotation
+import com.lowagie.text.Chunk
 import com.lowagie.text.Document
 import com.lowagie.text.DocumentException
 import com.lowagie.text.Element
 import com.lowagie.text.Image
+import com.lowagie.text.Rectangle
 import com.lowagie.text.pdf.BaseFont
+import com.lowagie.text.pdf.PdfAnnotation
 import com.lowagie.text.pdf.PdfContentByte
 import com.lowagie.text.pdf.PdfGState
 import com.lowagie.text.pdf.PdfImage
@@ -24,7 +27,9 @@ import com.lowagie.text.pdf.PdfLayer
 import com.lowagie.text.pdf.PdfName
 import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfStamper
+import com.lowagie.text.pdf.PdfString
 import com.lowagie.text.pdf.PdfWriter
+import java.awt.Color
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -155,6 +160,7 @@ object AnnotationManager {
         return isRemoved
     }
 
+
     /** Adds circle to the PDF document. Will need reference hash for identification */
     @Throws(FileNotFoundException::class, IOException::class)
     @JvmStatic
@@ -257,9 +263,10 @@ object AnnotationManager {
             val rectHeight = 35F
 
             // center rectangle to the touched point
-            val rectX = pointF.x - rectWidth/2
-            val rectY = pointF.y - rectHeight/2
-            over.rectangle(rectX, rectY,rectWidth, rectHeight)
+            val rectX = pointF.x - rectWidth / 2
+            val rectY = pointF.y - rectHeight / 2
+           over.rectangle(rectX, rectY, rectWidth, rectHeight)
+
             over.stroke()
 
             // todo: Add reference hash
@@ -321,6 +328,67 @@ object AnnotationManager {
             cb.stroke()
 
             cb.sanityCheck()
+            true
+        } catch (de: DocumentException) {
+            System.err.println(de.message)
+            false
+        } catch (de: IOException) {
+            System.err.println(de.message)
+            false
+        } finally {
+            // step 5: we close the document
+            document.close()
+        }
+    }
+
+    /** Try to use PdfAnnotation - WIP */
+
+    @Throws(java.lang.Exception::class)
+    @JvmStatic
+    fun addRectAnnotation(
+        context: Context,
+        currUri: Uri,
+    ): Boolean {
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+
+        if (filePath.isNullOrEmpty()) throw java.lang.Exception("Input file is empty")
+        val file = File(filePath)
+        if (!file.exists()) throw java.lang.Exception("Input file does not exists")
+        val fileOutputStream = FileOutputStream(file, true)
+
+        // step 1: creation of a document-object
+        val document = Document()
+        return try {
+
+            // step 2: creation of the writer
+            val writer = PdfWriter.getInstance(document, fileOutputStream)
+
+            // step 3: we open the document
+            document.open()
+
+            // to get rid of "The page 1 was requested but the document has only 0 pages."
+            document.add(Chunk("tt"))
+
+            val inputStream: InputStream = FileInputStream(file)
+
+            // we create a reader for a certain document
+            val reader = PdfReader(inputStream)
+
+            // we create a stamper that will copy the document to a new file
+            val stamp = PdfStamper(reader, FileOutputStream(file))
+
+            val rect = Rectangle(200F, 350F, 350F, 500F)
+
+            val annotation = PdfAnnotation.createSquareCircle(writer, rect, "Test content", true)
+            annotation.put(PdfName.RECT, PdfString("Advertisement 1"));
+
+            annotation.setColor(Color.BLUE)
+
+            stamp.addAnnotation(annotation, 1);
+
+            // closing PdfStamper will generate the new PDF file
+            stamp.close()
+            reader.close()
             true
         } catch (de: DocumentException) {
             System.err.println(de.message)
