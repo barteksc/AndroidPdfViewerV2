@@ -286,6 +286,95 @@ object AnnotationManager {
         return isAdded
     }
 
+    @JvmStatic
+    fun addLines(
+        context: Context,
+        currUri: Uri,
+        pdfView: PDFView,
+    ): Boolean {
+        // Hint: Page Starts From --> 1 In OpenPdf Core
+        var page = pdfView.currentPage
+        page++
+
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+
+        // get file and FileOutputStream
+        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
+        val file = File(filePath)
+        if (!file.exists()) throw FileNotFoundException()
+
+        var isAdded = false
+        try {
+            // input stream from file
+            val inputStream: InputStream = FileInputStream(file)
+
+            // we create a reader for a certain document
+            val reader = PdfReader(inputStream)
+
+            // we create a stamper that will copy the document to a new file
+            val stamp = PdfStamper(reader, FileOutputStream(file))
+
+            // content over the existing page
+            val over: PdfContentByte = stamp.getOverContent(page)
+
+            // default blue
+            over.setRGBColorStroke(0, 0, 255)
+
+            over.setLineWidth(1f)
+
+
+            // drawing lines on the provided "PDF-Test1.pdf"
+            // line 1 coordinates - line above letter B
+            val l1_x1 = 512f
+            val l1_y1 = 105f
+            val l1_x2 = 512f
+            val l1_y2 = 380f
+
+            // prepare line 1
+            over.moveTo(l1_x1, l1_y1)
+            over.lineTo(l1_x2, l1_y2)
+
+            // line 2 coordinates - line from D to B
+            val l2_x1 = 84f
+            val l2_y1 = 98f
+            val l2_x2 = 504f
+            val l2_y2 = 98f
+
+            // prepare line 2
+            over.moveTo(l2_x1, l2_y1)
+            over.lineTo(l2_x2, l2_y2)
+
+            // line 3 coordinates - from D to above B
+            val l3_x1 = 84f
+            val l3_y1 = 104f
+            val l3_x2 = 508f
+            val l3_y2 = 380f
+
+            // prepare line 3
+            over.moveTo(l3_x1, l3_y1)
+            over.lineTo(l3_x2, l3_y2)
+
+            //draw lines
+            over.stroke()
+
+            // todo: Add reference hash
+            // add as layer
+            val wmLayer = PdfLayer("lines-referenceHash", stamp.writer)
+            over.beginLayer(wmLayer)
+            over.endLayer()
+
+            // closing PdfStamper will generate the new PDF file
+            stamp.close()
+            over.sanityCheck()
+
+            isAdded = true
+        } catch (de: java.lang.Exception) {
+            de.printStackTrace()
+        }
+        return isAdded
+    }
+
+
     /** Replaces the current document with document that contains a dashed line - WIP
      *  TODO: Add the lines to the original document, instead of replacing it, use MotionEvent's coordinates, add id/reference hash
      *  */
