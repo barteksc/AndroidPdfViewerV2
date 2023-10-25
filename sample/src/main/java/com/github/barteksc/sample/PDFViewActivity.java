@@ -268,6 +268,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     @Override
     public void onLongPress(MotionEvent e) {
+        if (!pdfView.isAnnotationHandlingEnabled()) {
+            return;
+        }
         // here we have a long click
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
@@ -275,7 +278,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
             try {
 //                boolean isAdded = AnnotationManager.addRectAnnotation(this, currUri);
 //                boolean isAdded = AnnotationManager.addRectangle(this, e,currUri, pdfView);
-                boolean isAdded = AnnotationManager.addLines(this,currUri, pdfView);
+                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 
 //                boolean isAdded = AnnotationManager.addCircle(this, e,currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLineAnnotation(this, currUri);

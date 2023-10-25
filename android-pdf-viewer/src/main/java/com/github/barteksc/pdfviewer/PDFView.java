@@ -242,6 +242,9 @@ public class PDFView extends RelativeLayout {
      */
     private boolean bestQuality = false;
 
+    /** True if annotation handling should be enabled - long press to add new annotation, tapping on annotation to delete it  */
+    private boolean annotationHandling = false;
+
     /**
      * True if annotations should be rendered
      * False otherwise
@@ -1261,9 +1264,16 @@ public class PDFView extends RelativeLayout {
     public void enableAnnotationRendering(boolean annotationRendering) {
         this.annotationRendering = annotationRendering;
     }
+    public void enableAnnotationHandling(boolean annotationRendering) {
+        this.annotationHandling= annotationHandling;
+    }
 
     public boolean isAnnotationRendering() {
         return annotationRendering;
+    }
+
+    public boolean isAnnotationHandlingEnabled() {
+        return annotationHandling;
     }
 
     public void enableRenderDuringScale(boolean renderDuringScale) {
@@ -1708,6 +1718,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.setDefaultPage(defaultPage);
             PDFView.this.setSwipeVertical(!swipeHorizontal);
             PDFView.this.enableAnnotationRendering(annotationRendering);
+            PDFView.this.enableAnnotationHandling(annotationHandling);
             PDFView.this.setScrollHandle(scrollHandle);
             PDFView.this.enableAntialiasing(antialiasing);
             PDFView.this.setSpacing(spacing);

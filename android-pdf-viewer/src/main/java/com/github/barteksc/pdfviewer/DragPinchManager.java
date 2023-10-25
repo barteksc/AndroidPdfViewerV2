@@ -78,6 +78,10 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
 
     @Override
     public boolean onSingleTapConfirmed(MotionEvent e) {
+        if (!pdfView.isAnnotationHandlingEnabled()) {
+            return false;
+        }
+
         boolean onTapHandled = pdfView.callbacks.callOnTap(e);
         boolean linkTapped = checkTappedLink(e.getX(), e.getY());
         if (!onTapHandled && !linkTapped) {
