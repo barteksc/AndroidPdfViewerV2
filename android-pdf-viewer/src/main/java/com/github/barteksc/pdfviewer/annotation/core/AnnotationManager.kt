@@ -220,6 +220,81 @@ object AnnotationManager {
         return isAdded
     }
 
+    @Throws(FileNotFoundException::class, IOException::class)
+    @JvmStatic
+    fun addCircleWithAnnotationAsLayer(
+        context: Context,
+        e: MotionEvent,
+        currUri: Uri,
+        pdfView: PDFView
+    ): Boolean {
+        // Page Starts From 1 In OpenPDF Core
+        var page = pdfView.currentPage
+        page++
+
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+
+        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
+        val file = File(filePath)
+        if (!file.exists()) throw FileNotFoundException()
+
+        val referenceHash = StringBuilder()
+            .append(PublicValue.KEY_REFERENCE_HASH)
+            .append(UUID.randomUUID().toString())
+            .toString()
+
+        var isAdded = false
+        try {
+            val inputStream: InputStream = FileInputStream(file)
+            val reader = PdfReader(inputStream)
+            val stamp = PdfStamper(reader, FileOutputStream(file))
+            val over: PdfContentByte = stamp.getOverContent(page)
+            over.setRGBColorStroke(0, 0, 255)
+
+            val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
+            val circleRadius = 30F
+
+            // Create a circle annotation
+            val circleAnnotation = PdfAnnotation.createSquareCircle(
+                stamp.writer,
+                Rectangle(
+                    pointF.x - circleRadius,
+                    pointF.y - circleRadius,
+                    pointF.x + circleRadius,
+                    pointF.y + circleRadius
+                ),
+                "Circle Annotation",
+                false
+            )
+
+            // Set the color of the circle annotation
+            circleAnnotation.setColor(Color.GREEN)
+
+            // Create a layer for the annotation
+            val annotationLayer = PdfLayer(referenceHash, stamp.writer)
+
+            // Add the annotation to the layer
+            over.beginLayer(annotationLayer)
+            // this is adding the annotation but is it adding it as it's needed?
+            stamp.addAnnotation(circleAnnotation, page)
+
+            // give this a try when jitpack is working right
+            // over.addAnnotation(circleAnnotation)
+
+            over.endLayer()
+
+            // Close the PdfStamper
+            stamp.close()
+
+            isAdded = true
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+
+        return isAdded
+    }
+
+
     /** Adds rectangle to the PDF document. Will need reference hash for identification */
     @Throws(FileNotFoundException::class, IOException::class)
     @JvmStatic
@@ -265,7 +340,7 @@ object AnnotationManager {
             // center rectangle to the touched point
             val rectX = pointF.x - rectWidth / 2
             val rectY = pointF.y - rectHeight / 2
-           over.rectangle(rectX, rectY, rectWidth, rectHeight)
+            over.rectangle(rectX, rectY, rectWidth, rectHeight)
 
             over.stroke()
 

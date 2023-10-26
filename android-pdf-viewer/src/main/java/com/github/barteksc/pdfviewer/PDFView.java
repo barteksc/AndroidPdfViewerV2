@@ -1264,7 +1264,7 @@ public class PDFView extends RelativeLayout {
     public void enableAnnotationRendering(boolean annotationRendering) {
         this.annotationRendering = annotationRendering;
     }
-    public void enableAnnotationHandling(boolean annotationRendering) {
+    public void enableAnnotationHandling(boolean annotationHandling) {
         this.annotationHandling= annotationHandling;
     }
 
@@ -1529,6 +1529,7 @@ public class PDFView extends RelativeLayout {
         private boolean swipeHorizontal = false;
 
         private boolean annotationRendering = false;
+        private boolean annotationHandling = false;
 
         private String password = null;
 
@@ -1571,6 +1572,11 @@ public class PDFView extends RelativeLayout {
 
         public Configurator enableAnnotationRendering(boolean annotationRendering) {
             this.annotationRendering = annotationRendering;
+            return this;
+        }
+
+        public Configurator enableAnnotationHandling(boolean annotationHandling) {
+            this.annotationHandling= annotationHandling;
             return this;
         }
 

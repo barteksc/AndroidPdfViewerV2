@@ -174,12 +174,12 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         pdfFileName = getFileName(currUri);
 
         currFilePath = UriUtils.getPathFromUri(this, currUri);
-//        String currFileName = pdfFileName;
 
         this.configurator = pdfView.fromUri(currUri)
                 .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
                 .onPageChange(this)
                 .enableAnnotationRendering(true)
+                .enableAnnotationHandling(true)
                 .onLoad(this)
                 .enableSwipe(true)
                 .scrollHandle(new DefaultScrollHandle(this))
@@ -276,9 +276,10 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
+                boolean isAdded = AnnotationManager.addCircleWithAnnotationAsLayer(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addRectAnnotation(this, currUri);
 //                boolean isAdded = AnnotationManager.addRectangle(this, e,currUri, pdfView);
-                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
+//                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 
 //                boolean isAdded = AnnotationManager.addCircle(this, e,currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLineAnnotation(this, currUri);
