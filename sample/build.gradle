@@ -38,8 +38,5 @@ dependencies {
 
     // OpenPDF
     implementation 'com.github.librepdf:openpdf:1.3.23'
-
-    // todo:try when jitpack is working right
-    // implementation 'com.github.simona114.OpenPDF:62a389e5cc'
     implementation 'com.github.andob:android-awt:1.0.0'
 }

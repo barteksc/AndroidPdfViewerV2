@@ -19,6 +19,7 @@ import com.lowagie.text.Element
 import com.lowagie.text.Image
 import com.lowagie.text.Rectangle
 import com.lowagie.text.pdf.BaseFont
+import com.lowagie.text.pdf.PdfAction
 import com.lowagie.text.pdf.PdfAnnotation
 import com.lowagie.text.pdf.PdfContentByte
 import com.lowagie.text.pdf.PdfGState
@@ -248,13 +249,10 @@ object AnnotationManager {
             val inputStream: InputStream = FileInputStream(file)
             val reader = PdfReader(inputStream)
             val stamp = PdfStamper(reader, FileOutputStream(file))
-            val over: PdfContentByte = stamp.getOverContent(page)
-            over.setRGBColorStroke(0, 0, 255)
 
             val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
             val circleRadius = 30F
 
-            // Create a circle annotation
             val circleAnnotation = PdfAnnotation.createSquareCircle(
                 stamp.writer,
                 Rectangle(
@@ -263,28 +261,44 @@ object AnnotationManager {
                     pointF.x + circleRadius,
                     pointF.y + circleRadius
                 ),
-                "Circle Annotation",
+                referenceHash,
                 false
             )
+            circleAnnotation.apply {
+                setColor(Color.RED)
+            }
 
-            // Set the color of the circle annotation
-            circleAnnotation.setColor(Color.GREEN)
+            val linkAnnotation = PdfAnnotation(
+                stamp.writer, pointF.x - circleRadius,
+                pointF.y - circleRadius,
+                pointF.x + circleRadius,
+                pointF.y + circleRadius, PdfAction(referenceHash)
+            )
 
-            // Create a layer for the annotation
+            // add annotation into target page
+            val over = stamp.getOverContent(page)
+            if (over == null) {
+                stamp.close()
+                reader.close()
+                throw java.lang.Exception("GetUnderContent() is null")
+            }
+
+            // Create a layer for the annotation(s)
             val annotationLayer = PdfLayer(referenceHash, stamp.writer)
 
             // Add the annotation to the layer
             over.beginLayer(annotationLayer)
-            // this is adding the annotation but is it adding it as it's needed?
             stamp.addAnnotation(circleAnnotation, page)
+            stamp.addAnnotation(linkAnnotation, page)
 
-            // give this a try when jitpack is working right
-            // over.addAnnotation(circleAnnotation)
-
+            //  works the same
+            //  over.addAnnotation(circleAnnotation)
+            //  over.addAnnotation(linkAnnotation)
             over.endLayer()
 
             // Close the PdfStamper
             stamp.close()
+            reader.close()
 
             isAdded = true
         } catch (ex: Exception) {
