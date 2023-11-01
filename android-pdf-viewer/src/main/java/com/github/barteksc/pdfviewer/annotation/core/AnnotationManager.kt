@@ -275,7 +275,6 @@ object AnnotationManager {
             // Create a layer for the annotations
             val annotationLayer = PdfLayer(referenceHash, stamp.writer)
 
-            //tofo:remove radius
             val rectAnnotation = PdfAnnotation.createSquareCircle(
                 stamp.writer,
                 Rectangle(
@@ -315,6 +314,98 @@ object AnnotationManager {
             // Add the annotations to the layer
             over.beginLayer(annotationLayer)
             stamp.addAnnotation(rectAnnotation, page)
+            stamp.addAnnotation(linkAnnotation, page)
+            over.endLayer()
+
+            // Close the PdfStamper
+            stamp.close()
+            reader.close()
+
+            isAdded = true
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+
+        return isAdded
+    }
+
+    /** Draws a layer with a line and a link annotation to the PDF document */
+    @Throws(FileNotFoundException::class, IOException::class)
+    @JvmStatic
+    fun addLineAnnotation(
+        context: Context,
+        e: MotionEvent,
+        currUri: Uri,
+        pdfView: PDFView
+    ): Boolean {
+        // Page Starts From 1 In OpenPDF Core
+        var page = pdfView.currentPage
+        page++
+
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+
+        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
+        val file = File(filePath)
+        if (!file.exists()) throw FileNotFoundException()
+
+        val referenceHash = StringBuilder()
+            .append(PublicValue.KEY_REFERENCE_HASH)
+            .append(UUID.randomUUID().toString())
+            .toString()
+
+        var isAdded = false
+        try {
+            val inputStream: InputStream = FileInputStream(file)
+            val reader = PdfReader(inputStream)
+            val stamp = PdfStamper(reader, FileOutputStream(file))
+
+            val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
+            // The space to extend to
+            val border = 30F
+
+            // Create a layer for the annotations
+            val annotationLayer = PdfLayer(referenceHash, stamp.writer)
+
+            val linkAnnotation = PdfAnnotation(
+                stamp.writer, pointF.x - border,
+                pointF.y - border,
+                pointF.x + border,
+                pointF.y + border, PdfAction(referenceHash)
+            )
+            linkAnnotation.apply {
+                put(PdfName.OC, annotationLayer)
+                put(PdfName.TYPE, PdfName.XOBJECT)
+            }
+
+            // add annotation into target page
+            val over = stamp.getOverContent(page)
+            if (over == null) {
+                stamp.close()
+                reader.close()
+                throw java.lang.Exception("GetUnderContent() is null")
+            }
+
+            // Add the annotations to the layer
+            over.beginLayer(annotationLayer)
+            over.apply {
+                // Setting blue as default
+                setRGBColorStroke(0, 0, 255)
+                setLineWidth(1f)
+
+                // line coordinates
+                val l1_x1 = pointF.x - border
+                val l1_y1 = pointF.y
+                val l1_x2 = pointF.x + border
+                val l1_y2 = pointF.y
+
+                // prepare line
+                moveTo(l1_x1, l1_y1)
+                lineTo(l1_x2, l1_y2)
+
+                //draw lines
+                over.stroke()
+            }
+
             stamp.addAnnotation(linkAnnotation, page)
             over.endLayer()
 

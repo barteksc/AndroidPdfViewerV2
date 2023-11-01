@@ -277,7 +277,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         new Handler().post(() -> {
             try {
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
-                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
+//                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
+                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 //                   boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
