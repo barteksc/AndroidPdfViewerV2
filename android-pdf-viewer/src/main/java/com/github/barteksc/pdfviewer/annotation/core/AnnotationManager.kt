@@ -253,6 +253,9 @@ object AnnotationManager {
             val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
             val circleRadius = 30F
 
+            // Create a layer for the annotations
+            val annotationLayer = PdfLayer(referenceHash, stamp.writer)
+
             val circleAnnotation = PdfAnnotation.createSquareCircle(
                 stamp.writer,
                 Rectangle(
@@ -266,6 +269,8 @@ object AnnotationManager {
             )
             circleAnnotation.apply {
                 setColor(Color.RED)
+                put(PdfName.OC, annotationLayer);
+                put(PdfName.TYPE, PdfName.XOBJECT);
             }
 
             val linkAnnotation = PdfAnnotation(
@@ -274,6 +279,10 @@ object AnnotationManager {
                 pointF.x + circleRadius,
                 pointF.y + circleRadius, PdfAction(referenceHash)
             )
+            linkAnnotation.apply {
+                put(PdfName.OC, annotationLayer);
+                put(PdfName.TYPE, PdfName.XOBJECT);
+            }
 
             // add annotation into target page
             val over = stamp.getOverContent(page)
@@ -283,17 +292,10 @@ object AnnotationManager {
                 throw java.lang.Exception("GetUnderContent() is null")
             }
 
-            // Create a layer for the annotation(s)
-            val annotationLayer = PdfLayer(referenceHash, stamp.writer)
-
-            // Add the annotation to the layer
+            // Add the annotations to the layer
             over.beginLayer(annotationLayer)
             stamp.addAnnotation(circleAnnotation, page)
             stamp.addAnnotation(linkAnnotation, page)
-
-            //  works the same
-            //  over.addAnnotation(circleAnnotation)
-            //  over.addAnnotation(linkAnnotation)
             over.endLayer()
 
             // Close the PdfStamper
@@ -621,6 +623,8 @@ object AnnotationManager {
             val stamp = PdfStamper(reader, FileOutputStream(file))
 
             // get watermark icon
+
+//            val tr =
             val img = Image.getInstance(OCGCover)
             img.annotation = Annotation(0f, 0f, 0f, 0f, referenceHash)
             img.transparency = intArrayOf(0x00, 0x10)
