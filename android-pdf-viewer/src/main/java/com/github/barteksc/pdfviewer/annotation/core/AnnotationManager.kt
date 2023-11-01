@@ -269,7 +269,8 @@ object AnnotationManager {
             val stamp = PdfStamper(reader, FileOutputStream(file))
 
             val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
-            val circleRadius = 30F
+            // The space to extend to
+            val border = 30F
 
             // Create a layer for the annotations
             val annotationLayer = PdfLayer(referenceHash, stamp.writer)
@@ -278,10 +279,10 @@ object AnnotationManager {
             val rectAnnotation = PdfAnnotation.createSquareCircle(
                 stamp.writer,
                 Rectangle(
-                    pointF.x - circleRadius,
-                    pointF.y - circleRadius,
-                    pointF.x + circleRadius,
-                    pointF.y + circleRadius
+                    pointF.x - border,
+                    pointF.y - border,
+                    pointF.x + border,
+                    pointF.y + border
                 ),
                 referenceHash,
                 true
@@ -293,10 +294,10 @@ object AnnotationManager {
             }
 
             val linkAnnotation = PdfAnnotation(
-                stamp.writer, pointF.x - circleRadius,
-                pointF.y - circleRadius,
-                pointF.x + circleRadius,
-                pointF.y + circleRadius, PdfAction(referenceHash)
+                stamp.writer, pointF.x - border,
+                pointF.y - border,
+                pointF.x + border,
+                pointF.y + border, PdfAction(referenceHash)
             )
             linkAnnotation.apply {
                 put(PdfName.OC, annotationLayer)
