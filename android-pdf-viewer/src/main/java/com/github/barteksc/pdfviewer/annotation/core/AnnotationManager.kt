@@ -127,6 +127,96 @@ object AnnotationManager {
         return isAdded
     }
 
+    /** Draws a layer with a rectangle annotation and a link annotation to the PDF document */
+    @Throws(FileNotFoundException::class, IOException::class)
+    @JvmStatic
+    fun addRectAnnotation(
+        context: Context,
+        e: MotionEvent,
+        currUri: Uri,
+        pdfView: PDFView
+    ): Boolean {
+        // Page Starts From 1 In OpenPDF Core
+        var page = pdfView.currentPage
+        page++
+
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+
+        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
+        val file = File(filePath)
+        if (!file.exists()) throw FileNotFoundException()
+
+        val referenceHash = StringBuilder()
+            .append(PublicValue.KEY_REFERENCE_HASH)
+            .append(UUID.randomUUID().toString())
+            .toString()
+
+        var isAdded = false
+        try {
+            val inputStream: InputStream = FileInputStream(file)
+            val reader = PdfReader(inputStream)
+            val stamp = PdfStamper(reader, FileOutputStream(file))
+
+            val pointF: PointF = pdfView.convertScreenPintsToPdfCoordinates(e)
+            val circleRadius = 30F
+
+            // Create a layer for the annotations
+            val annotationLayer = PdfLayer(referenceHash, stamp.writer)
+
+            val rectAnnotation = PdfAnnotation.createSquareCircle(
+                stamp.writer,
+                Rectangle(
+                    pointF.x - circleRadius,
+                    pointF.y - circleRadius,
+                    pointF.x + circleRadius,
+                    pointF.y + circleRadius
+                ),
+                referenceHash,
+                true
+            )
+            rectAnnotation.apply {
+                setColor(Color.BLUE)
+                put(PdfName.OC, annotationLayer)
+                put(PdfName.TYPE, PdfName.XOBJECT)
+            }
+
+            val linkAnnotation = PdfAnnotation(
+                stamp.writer, pointF.x - circleRadius,
+                pointF.y - circleRadius,
+                pointF.x + circleRadius,
+                pointF.y + circleRadius, PdfAction(referenceHash)
+            )
+            linkAnnotation.apply {
+                put(PdfName.OC, annotationLayer)
+                put(PdfName.TYPE, PdfName.XOBJECT)
+            }
+
+            // add annotation into target page
+            val over = stamp.getOverContent(page)
+            if (over == null) {
+                stamp.close()
+                reader.close()
+                throw java.lang.Exception("GetUnderContent() is null")
+            }
+
+            // Add the annotations to the layer
+            over.beginLayer(annotationLayer)
+            stamp.addAnnotation(rectAnnotation, page)
+            stamp.addAnnotation(linkAnnotation, page)
+            over.endLayer()
+
+            // Close the PdfStamper
+            stamp.close()
+            reader.close()
+
+            isAdded = true
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+        }
+
+        return isAdded
+    }
+
     @JvmStatic
     fun addLines(
         context: Context,
@@ -232,7 +322,7 @@ object AnnotationManager {
 
     @Throws(java.lang.Exception::class)
     fun removeOCG(filePath: String?, annotationHash: String?): Boolean {
-        if (filePath == null || filePath.isEmpty()) throw java.lang.Exception("Input file is empty")
+        if (filePath.isNullOrEmpty()) throw java.lang.Exception("Input file is empty")
         val file = File(filePath)
         if (!file.exists()) throw java.lang.Exception("Input file does not exists")
         return try {
