@@ -92,6 +92,7 @@ public class DefaultScrollHandle extends RelativeLayout implements ScrollHandle 
         LayoutParams tvlp = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         tvlp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
 
+        removeView(textView);
         addView(textView, tvlp);
 
         lp.addRule(align);

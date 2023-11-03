@@ -1763,6 +1763,7 @@ public class PDFView extends RelativeLayout {
             PDFView.this.callbacks.setOnLongPress(onLongPressListener);
             PDFView.this.callbacks.setOnPageError(onPageErrorListener);
             PDFView.this.callbacks.setLinkHandler(linkHandler);
+            PDFView.this.setScrollHandle(scrollHandle);
 
             if (currPage != -1) {
                 // stay in curr page
