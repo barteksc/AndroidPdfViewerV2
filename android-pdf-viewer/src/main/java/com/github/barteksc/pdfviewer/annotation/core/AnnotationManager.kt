@@ -289,7 +289,6 @@ object AnnotationManager {
             rectAnnotation.apply {
                 setColor(Color.BLUE)
                 put(PdfName.OC, annotationLayer)
-                put(PdfName.TYPE, PdfName.XOBJECT)
             }
 
             val linkAnnotation = PdfAnnotation(
@@ -317,9 +316,12 @@ object AnnotationManager {
             stamp.addAnnotation(linkAnnotation, page)
             over.endLayer()
 
+
+
             // Close the PdfStamper
             stamp.close()
             reader.close()
+
 
             isAdded = true
         } catch (ex: Exception) {

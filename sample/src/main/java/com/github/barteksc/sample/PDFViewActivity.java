@@ -40,6 +40,7 @@ import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
+import com.github.barteksc.pdfviewer.annotation.core.PdfUtil;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -276,12 +277,16 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
+                String testFilePath = "/storage/emulated/0/Download/sample.pdf";
+                PdfUtil.getAnnotationInfo(testFilePath);
+
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
-                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
+//                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 //                   boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
+                boolean isAdded = true;
                 if (isAdded) {
                     configurator.refresh(pdfView.getCurrentPage());// refresh view
                 } else {
