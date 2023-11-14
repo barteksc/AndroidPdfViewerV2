@@ -277,8 +277,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
-                String testFilePath = "/storage/emulated/0/Download/sample.pdf";
-                PdfUtil.getAnnotationInfo(testFilePath);
+                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
+                PdfUtil.getAnnotationsExtra(testFilePath);
+                boolean isAdded = true;
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
@@ -286,7 +287,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 //                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 //                   boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
-                boolean isAdded = true;
+
                 if (isAdded) {
                     configurator.refresh(pdfView.getCurrentPage());// refresh view
                 } else {
