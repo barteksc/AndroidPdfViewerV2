@@ -13,6 +13,7 @@ import java.io.InputStream
 
 
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import androidx.annotation.WorkerThread
@@ -92,6 +93,8 @@ object PdfUtil {
 
                 // create a bitmap
                 val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+                // ensure white background
+                bitmap.eraseColor(Color.WHITE)
 
                 // render the page on the bitmap
                 page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
