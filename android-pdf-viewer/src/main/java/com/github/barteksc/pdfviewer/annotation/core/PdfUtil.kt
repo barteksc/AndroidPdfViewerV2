@@ -14,6 +14,7 @@ import java.io.InputStream
 
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.graphics.PointF
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import androidx.annotation.WorkerThread
@@ -74,6 +75,91 @@ object PdfUtil {
         }
     }
 
+
+    /** Extract the annotation's corners' coordinates for the given PDF file path */
+    @Throws(IOException::class)
+    @JvmStatic
+    fun getAnnotationsCoordinates(filePath: String) : List<PointF>{
+        logDebug(TAG, "file path is: $filePath")
+
+        if (filePath.isEmpty()) throw Exception("Input file is empty")
+        val file = File(filePath)
+        if (!file.exists()) throw Exception("Input file does not exist")
+
+        // stores the corners of the annotation
+        val annotationPoints = mutableListOf<PointF>()
+
+        // input stream from file
+        val inputStream: InputStream = FileInputStream(file)
+
+        // we create a reader for a certain document
+        val reader = PdfReader(inputStream)
+
+        val n = reader.numberOfPages
+
+        var page: PdfDictionary
+        for (i in 1..n) {
+            page = reader.getPageN(i)
+            val annots: PdfArray? = page.getAsArray(PdfName.ANNOTS)
+            if (annots == null) {
+                logDebug(TAG, "Annotations array for page $i is null")
+            } else {
+                logDebug(TAG, "Annotations array for page $i: $annots")
+
+                for (j in 0 until annots.size()) {
+                    val annotation: PdfDictionary = annots.getAsDict(j)
+
+                    // Extract extras
+                    // coordinates of the rectangle of the annotation
+                    val rectArray: PdfArray? = annotation.getAsArray(PdfName.RECT)
+                    // type of annotation
+                    val subtype: PdfName? = annotation.getAsName(PdfName.SUBTYPE)
+
+                    if (rectArray != null && rectArray.size() == 4) {
+                        // bottom left corner's coordinates
+                        val llx: Float = rectArray.getAsNumber(0).floatValue()
+                        val lly: Float = rectArray.getAsNumber(1).floatValue()
+                        // top right corner's coordinates
+                        val urx: Float = rectArray.getAsNumber(2).floatValue()
+                        val ury: Float = rectArray.getAsNumber(3).floatValue()
+
+                        // from the extracted coordinates, calculate the rest, based on the annotation type
+                        if (subtype == PdfName.SQUARE) {
+                            // bottom left
+                            val xBottomLeftPoint = llx
+                            val yBottomLeftPoint = lly
+                            val bottomLeftPoint = PointF(xBottomLeftPoint, yBottomLeftPoint)
+
+                            // top right
+                            val xTopRightPoint = urx
+                            val yTopRightPoint = ury
+                            val topRightPoint = PointF(xTopRightPoint, yTopRightPoint)
+
+                            // todo: top left
+                            // todo: bottom right
+
+                            annotationPoints.add(bottomLeftPoint)
+                            annotationPoints.add(topRightPoint)
+                            // todo: add the rest
+
+                            logDebug(TAG, "Annotation is square")
+
+                        } else if (subtype == PdfName.CIRCLE) {
+                            // todo: check circle's rect
+                        }
+
+                        logDebug(TAG, "Annotation $j on page $i - RECT values:")
+                        logDebug(TAG, "  llx: $llx")
+                        logDebug(TAG, "  lly: $lly")
+                        logDebug(TAG, "  urx: $urx")
+                        logDebug(TAG, "  ury: $ury")
+                    }
+                }
+            }
+        }
+        return annotationPoints
+    }
+
     @JvmStatic
     @WorkerThread
     @Throws(IOException::class)
@@ -102,7 +188,11 @@ object PdfUtil {
                 val pdfName = extractFileNameFromPath(pdfPath)
 
                 // save the bitmap as a PNG file
-                val pngFile = saveBitmapAsPng(bitmap, outputDirectory, "PdfToImage-$pdfName-page-${i+1}.png")
+                val pngFile = saveBitmapAsPng(
+                    bitmap,
+                    outputDirectory,
+                    "PdfToImage-$pdfName-page-${i + 1}.png"
+                )
                 pngFiles.add(pngFile)
 
                 // close the page
