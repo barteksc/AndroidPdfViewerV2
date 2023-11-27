@@ -11,6 +11,14 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.io.InputStream
 
+
+import android.graphics.Bitmap
+import android.graphics.pdf.PdfRenderer
+import android.os.ParcelFileDescriptor
+import androidx.annotation.WorkerThread
+import java.io.FileNotFoundException
+import java.io.FileOutputStream
+
 object PdfUtil {
 
     private val TAG: String = PdfUtil.javaClass.simpleName
@@ -64,4 +72,69 @@ object PdfUtil {
             }
         }
     }
+
+    @JvmStatic
+    @WorkerThread
+    @Throws(IOException::class)
+    fun convertPdfToPngFiles(
+        pdfPath: String, outputDirectory: String
+    ): List<File> {
+        val pngFiles = mutableListOf<File>()
+
+        // create a new renderer
+        val renderer = PdfRenderer(getSeekableFileDescriptor(pdfPath))
+
+        renderer.use { renderer ->
+            // render all pages
+            val pageCount = renderer.pageCount
+            for (i in 0 until pageCount) {
+                val page = renderer.openPage(i)
+
+                // create a bitmap
+                val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+
+                // render the page on the bitmap
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+
+                val pdfName = extractFileNameFromPath(pdfPath)
+
+                // save the bitmap as a PNG file
+                val pngFile = saveBitmapAsPng(bitmap, outputDirectory, "PdfToImage-$pdfName-page-${i+1}.png")
+                pngFiles.add(pngFile)
+
+                // close the page
+                page.close()
+            }
+        }
+
+        return pngFiles
+    }
+
+    private fun getSeekableFileDescriptor(pdfPath: String): ParcelFileDescriptor {
+        var fd: ParcelFileDescriptor? = null
+        try {
+            fd = ParcelFileDescriptor.open(File(pdfPath), ParcelFileDescriptor.MODE_READ_ONLY)
+        } catch (e: FileNotFoundException) {
+            e.printStackTrace()
+        }
+        return fd!!
+    }
+
+    private fun saveBitmapAsPng(bitmap: Bitmap, directory: String, fileName: String): File {
+        val file = File(directory, fileName)
+        try {
+            FileOutputStream(file).use { out ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return file
+    }
+
+    private fun extractFileNameFromPath(filePath: String): String {
+        val file = File(filePath)
+        return file.nameWithoutExtension
+    }
+
 }
