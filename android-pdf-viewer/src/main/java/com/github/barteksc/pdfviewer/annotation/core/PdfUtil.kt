@@ -79,15 +79,15 @@ object PdfUtil {
     /** Extract the annotation's corners' coordinates for the given PDF file path */
     @Throws(IOException::class)
     @JvmStatic
-    fun getAnnotationsCoordinates(filePath: String) : List<PointF>{
+    fun getAnnotationsCoordinates(filePath: String): List<List<PointF>> {
         logDebug(TAG, "file path is: $filePath")
 
         if (filePath.isEmpty()) throw Exception("Input file is empty")
         val file = File(filePath)
         if (!file.exists()) throw Exception("Input file does not exist")
 
-        // stores the corners of the annotation
-        val annotationPoints = mutableListOf<PointF>()
+        // a list of the corners of the annotations
+        val annotationPointsList = mutableListOf<List<PointF>>()
 
         // input stream from file
         val inputStream: InputStream = FileInputStream(file)
@@ -135,29 +135,24 @@ object PdfUtil {
                             val yTopRightPoint = ury
                             val topRightPoint = PointF(xTopRightPoint, yTopRightPoint)
 
-                            // todo: top left
-                            // todo: bottom right
-
-                            annotationPoints.add(bottomLeftPoint)
-                            annotationPoints.add(topRightPoint)
-                            // todo: add the rest
+                            val squareAnnotationPoints =
+                                generateRectangleCoordinates(bottomLeftPoint, topRightPoint)
+                            annotationPointsList.add(squareAnnotationPoints)
 
                             logDebug(TAG, "Annotation is square")
+                            logDebug(TAG, "Annotation $j on page $i - corner points:")
+                            logDebug(TAG, "squareAnnotationPoints:$squareAnnotationPoints")
+
 
                         } else if (subtype == PdfName.CIRCLE) {
                             // todo: check circle's rect
                         }
 
-                        logDebug(TAG, "Annotation $j on page $i - RECT values:")
-                        logDebug(TAG, "  llx: $llx")
-                        logDebug(TAG, "  lly: $lly")
-                        logDebug(TAG, "  urx: $urx")
-                        logDebug(TAG, "  ury: $ury")
                     }
                 }
             }
         }
-        return annotationPoints
+        return annotationPointsList
     }
 
     @JvmStatic
