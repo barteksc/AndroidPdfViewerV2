@@ -40,6 +40,7 @@ import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
+import com.github.barteksc.pdfviewer.annotation.core.PdfToImageResultData;
 import com.github.barteksc.pdfviewer.annotation.core.PdfUtil;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
@@ -277,29 +278,20 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
-//                // testing extraction of annotations
+//                // testing converting pdf to image, passing the result data
 //                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-//                PdfUtil.getAnnotationsExtra(testFilePath);
-//                boolean isAdded = true;
-
-//                // testing saving a PDF document to image
-//                String testPdfFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
 //                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
-//                String imageOutputPath = "/storage/emulated/0/Download/";
-//                PdfUtil.convertPdfToPngFiles(testPdfFilePath, imageOutputPath);
+//                String imageOutputDirectory = "/storage/emulated/0/Download/";
+//                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, imageOutputDirectory);
+//                Log.d(TAG, "onLongPress: result data is" + result);
 //                boolean isAdded = true;
-
-                // testing reading annottaion's rect coordinates
-                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-                PdfUtil.getAnnotationsCoordinates(testFilePath);
-                boolean isAdded = true;
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
-//                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
+                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
-//                   boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
+//                boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
 
                 if (isAdded) {
                     configurator.refresh(pdfView.getCurrentPage());// refresh view

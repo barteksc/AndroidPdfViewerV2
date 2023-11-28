@@ -74,19 +74,19 @@ object PdfUtil {
             }
         }
     }
-    
-    /** Extract the annotations' rectangle's corner coordinates for the given PDF file path */
+
+    /** Extract the annotations for the given PDF file path and page number */
     @Throws(IOException::class)
     @JvmStatic
-    fun getAnnotationsCoordinates(filePath: String): List<List<PointF>> {
+    fun getAnnotationsFrom(filePath: String, pageNum: Int): List<Annotation> {
         logDebug(TAG, "file path is: $filePath")
 
         if (filePath.isEmpty()) throw Exception("Input file is empty")
         val file = File(filePath)
         if (!file.exists()) throw Exception("Input file does not exist")
 
-        // a list of the annotations' rectangle's corners
-        val annotationPointsList = mutableListOf<List<PointF>>()
+        // a list of the annotations
+        val annotationsList = mutableListOf<Annotation>()
 
         // input stream from file
         val inputStream: InputStream = FileInputStream(file)
@@ -94,107 +94,121 @@ object PdfUtil {
         // we create a reader for a certain document
         val reader = PdfReader(inputStream)
 
-        val n = reader.numberOfPages
+        // read annotations for the given page
+        var page: PdfDictionary = reader.getPageN(pageNum)
+        val annots: PdfArray? = page.getAsArray(PdfName.ANNOTS)
+        if (annots == null) {
+            logDebug(TAG, "Annotations array for page $pageNum is null")
+        } else {
+            logDebug(TAG, "Annotations array for page $pageNum: $annots")
 
-        var page: PdfDictionary
-        for (i in 1..n) {
-            page = reader.getPageN(i)
-            val annots: PdfArray? = page.getAsArray(PdfName.ANNOTS)
-            if (annots == null) {
-                logDebug(TAG, "Annotations array for page $i is null")
-            } else {
-                logDebug(TAG, "Annotations array for page $i: $annots")
+            for (i in 0 until annots.size()) {
+                val annotation: PdfDictionary = annots.getAsDict(i)
 
-                for (j in 0 until annots.size()) {
-                    val annotation: PdfDictionary = annots.getAsDict(j)
+                // Extract extras
+                // coordinates of 2 corners of the rectangle of the annotation
+                val rectArray: PdfArray? = annotation.getAsArray(PdfName.RECT)
+                // type of annotation
+                val subtype: PdfName? = annotation.getAsName(PdfName.SUBTYPE)
 
-                    // Extract extras
-                    // coordinates of the rectangle of the annotation
-                    val rectArray: PdfArray? = annotation.getAsArray(PdfName.RECT)
-                    // type of annotation
-                    val subtype: PdfName? = annotation.getAsName(PdfName.SUBTYPE)
+                if (rectArray != null && rectArray.size() == 4) {
+                    // bottom left corner's coordinates
+                    val llx: Float = rectArray.getAsNumber(0).floatValue()
+                    val lly: Float = rectArray.getAsNumber(1).floatValue()
+                    // top right corner's coordinates
+                    val urx: Float = rectArray.getAsNumber(2).floatValue()
+                    val ury: Float = rectArray.getAsNumber(3).floatValue()
 
-                    if (rectArray != null && rectArray.size() == 4) {
-                        // bottom left corner's coordinates
-                        val llx: Float = rectArray.getAsNumber(0).floatValue()
-                        val lly: Float = rectArray.getAsNumber(1).floatValue()
-                        // top right corner's coordinates
-                        val urx: Float = rectArray.getAsNumber(2).floatValue()
-                        val ury: Float = rectArray.getAsNumber(3).floatValue()
+                    // from the extracted coordinates, calculate the rest, based on the annotation type
+                    if (subtype == PdfName.SQUARE) {
+                        // bottom left
+                        val xBottomLeftPoint = llx
+                        val yBottomLeftPoint = lly
+                        val bottomLeftPoint = PointF(xBottomLeftPoint, yBottomLeftPoint)
 
-                        // from the extracted coordinates, calculate the rest, based on the annotation type
-                        if (subtype == PdfName.SQUARE) {
-                            // bottom left
-                            val xBottomLeftPoint = llx
-                            val yBottomLeftPoint = lly
-                            val bottomLeftPoint = PointF(xBottomLeftPoint, yBottomLeftPoint)
+                        // top right
+                        val xTopRightPoint = urx
+                        val yTopRightPoint = ury
+                        val topRightPoint = PointF(xTopRightPoint, yTopRightPoint)
 
-                            // top right
-                            val xTopRightPoint = urx
-                            val yTopRightPoint = ury
-                            val topRightPoint = PointF(xTopRightPoint, yTopRightPoint)
+                        val squareAnnotationPoints =
+                            generateRectangleCoordinates(bottomLeftPoint, topRightPoint)
 
-                            val squareAnnotationPoints =
-                                generateRectangleCoordinates(bottomLeftPoint, topRightPoint)
-                            annotationPointsList.add(squareAnnotationPoints)
+                        val squareAnnotation = Annotation("RECTANGLE", squareAnnotationPoints)
+                        annotationsList.add(squareAnnotation)
 
-                            logDebug(TAG, "Annotation is square")
-                            logDebug(TAG, "Annotation $j on page $i - corner points:")
-                            logDebug(TAG, "squareAnnotationPoints:$squareAnnotationPoints")
+                        logDebug(TAG, "Annotation is square")
+                        logDebug(TAG, "Annotation $i on page $pageNum- corner points:")
+                        logDebug(TAG, "squareAnnotationPoints:$squareAnnotationPoints")
 
-
-                        } else if (subtype == PdfName.CIRCLE) {
-                            // todo: check circle's rect
-                        }
-
+                    } else if (subtype == PdfName.CIRCLE) {
+                        // todo: check circle's rect
                     }
+
                 }
             }
         }
-        return annotationPointsList
+
+        return annotationsList
     }
 
+    private fun getShapesFor(
+        pdfAnnotations: List<Annotation>,
+        pageHeight: Int
+    ): List<Shape> {
+        // convert annotation to shape
+        val shapes = pdfAnnotations.map { annotation ->
+            annotation.toShape(pageHeight)
+        }
+        return shapes
+    }
+
+
+    //  may need  @WorkerThread ?
     @JvmStatic
-    @WorkerThread
     @Throws(IOException::class)
-    fun convertPdfToPngFiles(
+    fun convertPdfAnnotationsToPngShapes(
         pdfPath: String, outputDirectory: String
-    ): List<File> {
-        val pngFiles = mutableListOf<File>()
+    ): PdfToImageResultData {
+        //saving result data here
+        var shapes: List<Shape>
+        lateinit var pngFile: File
 
         // create a new renderer
         val renderer = PdfRenderer(getSeekableFileDescriptor(pdfPath))
 
         renderer.use { renderer ->
-            // render all pages
-            val pageCount = renderer.pageCount
-            for (i in 0 until pageCount) {
-                val page = renderer.openPage(i)
+            // assuming the pdf will have only 1 page (for now)
+            val pageNum = 1
+            val page = renderer.openPage(pageNum)
 
-                // create a bitmap
-                val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
-                // ensure white background
-                bitmap.eraseColor(Color.WHITE)
+            // create a bitmap
+            val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
+            // ensure white background
+            bitmap.eraseColor(Color.WHITE)
 
-                // render the page on the bitmap
-                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+            // render the page on the bitmap
+            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-                val pdfName = extractFileNameFromPath(pdfPath)
+            val pdfName = extractFileNameFromPath(pdfPath)
 
-                // save the bitmap as a PNG file
-                val pngFile = saveBitmapAsPng(
-                    bitmap,
-                    outputDirectory,
-                    "PdfToImage-$pdfName-page-${i + 1}.png"
-                )
-                pngFiles.add(pngFile)
+            // save the bitmap as a PNG file
+            pngFile = saveBitmapAsPng(
+                bitmap,
+                outputDirectory,
+                "PdfToImage-$pdfName-page-${pageNum}.png"
+            )
 
-                // close the page
-                page.close()
-            }
+            val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum)
+
+            shapes = getShapesFor(pdfAnnotations, page.height)
+
+            // close the page
+            page.close()
+
         }
 
-        return pngFiles
+        return PdfToImageResultData(pngFile, shapes)
     }
 
     private fun getSeekableFileDescriptor(pdfPath: String): ParcelFileDescriptor {
