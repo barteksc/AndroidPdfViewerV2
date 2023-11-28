@@ -74,9 +74,8 @@ object PdfUtil {
             }
         }
     }
-
-
-    /** Extract the annotation's corners' coordinates for the given PDF file path */
+    
+    /** Extract the annotations' rectangle's corner coordinates for the given PDF file path */
     @Throws(IOException::class)
     @JvmStatic
     fun getAnnotationsCoordinates(filePath: String): List<List<PointF>> {
@@ -86,7 +85,7 @@ object PdfUtil {
         val file = File(filePath)
         if (!file.exists()) throw Exception("Input file does not exist")
 
-        // a list of the corners of the annotations
+        // a list of the annotations' rectangle's corners
         val annotationPointsList = mutableListOf<List<PointF>>()
 
         // input stream from file
