@@ -278,18 +278,18 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
-//                // testing converting pdf to image, passing the result data
-//                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
+                // testing converting pdf to image, passing the result data
+                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
 //                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
-//                String imageOutputDirectory = "/storage/emulated/0/Download/";
-//                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, imageOutputDirectory);
-//                Log.d(TAG, "onLongPress: result data is" + result);
-//                boolean isAdded = true;
+                String imageOutputDirectory = "/storage/emulated/0/Download/";
+                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, imageOutputDirectory);
+                Log.d(TAG, "onLongPress: result data is" + result);
+                boolean isAdded = true;
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
-                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
+//                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
 

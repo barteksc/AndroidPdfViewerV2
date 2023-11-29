@@ -6,7 +6,7 @@ import android.graphics.PointF
 data class Annotation(val type: String, val rectCorners: List<PointF>) {
 }
 
-fun Annotation.toShape(pageHeight: Int): Shape {
+fun Annotation.toRectangleShape(pageHeight: Int): Rectangle {
 
     // rect's corners mapped to image space
     val mappedPoints = listOf<PointF>(
@@ -16,16 +16,11 @@ fun Annotation.toShape(pageHeight: Int): Shape {
         rectCorners[3].convertCoordinatesFrom(pageHeight)
     )
 
-    // shape's corner points
-    val shapePoints = listOf<Point>(
-        Point(x = mappedPoints[0].x, y = mappedPoints[0].y),
-        Point(x = mappedPoints[1].x, y = mappedPoints[1].y),
-        Point(x = mappedPoints[2].x, y = mappedPoints[2].y),
-        Point(x = mappedPoints[3].x, y = mappedPoints[3].y),
-        )
+    // rectangle shape's corner points
+    val rectangleShapePoints = mappedPoints.map { it.toPoint() }
 
-    return Shape(
-        type,
-        shapePoints
-    )
+    // rectangle shape's edges
+    val rectangleShapeEdges = rectangleShapePoints.generateRectangleEdges()
+
+    return Rectangle(corners = rectangleShapePoints, edges = rectangleShapeEdges)
 }
