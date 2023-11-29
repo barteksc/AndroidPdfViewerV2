@@ -141,6 +141,8 @@ object PdfUtil {
 
                     } else if (subtype == PdfName.CIRCLE) {
                         // todo: check circle's rect
+                        logDebug(TAG, "Annotation is circle")
+
                     }
 
                 }
@@ -198,7 +200,7 @@ object PdfUtil {
                 "PdfToImage-$pdfName-page-${pageNum}.png"
             )
 
-            // in openpdf, pages start from 1
+            // in OpenPdf lib, pages start from 1
             val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum + 1)
 
             shapes = getShapesFor(pdfAnnotations, page.height)
