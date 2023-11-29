@@ -156,7 +156,7 @@ object PdfUtil {
     ): List<Rectangle> {
         // convert annotation to shape
         val shapes = pdfAnnotations.map { annotation ->
-         annotation.toRectangleShape(pageHeight)
+            annotation.toRectangleShape(pageHeight)
             // todo: adjust for other shapes
         }
         return shapes
@@ -178,7 +178,7 @@ object PdfUtil {
 
         renderer.use { renderer ->
             // assuming the pdf will have only 1 page (for now)
-            val pageNum = 1
+            val pageNum = 0
             val page = renderer.openPage(pageNum)
 
             // create a bitmap
@@ -198,7 +198,8 @@ object PdfUtil {
                 "PdfToImage-$pdfName-page-${pageNum}.png"
             )
 
-            val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum)
+            // in openpdf, pages start from 1
+            val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum + 1)
 
             shapes = getShapesFor(pdfAnnotations, page.height)
 
