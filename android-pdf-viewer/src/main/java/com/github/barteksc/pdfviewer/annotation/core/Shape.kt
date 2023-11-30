@@ -1,4 +1,3 @@
 package com.github.barteksc.pdfviewer.annotation.core
 
-//todo: use
-//open class Shape(val type:String, open val corners: List<Point>)
+abstract class Shape(open val type:String, open val corners: List<Point>)

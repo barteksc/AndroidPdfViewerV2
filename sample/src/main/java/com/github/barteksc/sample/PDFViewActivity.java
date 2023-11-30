@@ -284,7 +284,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 //                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
                 String imageOutputDirectory = "/storage/emulated/0/Download/";
                 PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, imageOutputDirectory);
-                Log.d(TAG, "onLongPress: result data is" + result);
+                Log.d(TAG, "onLongPress: result data is " + result);
                 boolean isAdded = true;
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);

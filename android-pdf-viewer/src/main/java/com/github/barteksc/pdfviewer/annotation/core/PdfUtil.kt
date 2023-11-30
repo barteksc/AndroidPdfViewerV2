@@ -155,11 +155,11 @@ object PdfUtil {
     private fun getShapesFor(
         pdfAnnotations: List<Annotation>,
         pageHeight: Int
-    ): List<Rectangle> {
+    ): List<Shape> {
         // convert annotation to shape
         val shapes = pdfAnnotations.map { annotation ->
-            annotation.toRectangleShape(pageHeight)
-            // todo: adjust for other shapes
+            return@map annotation.toRectangleShape(pageHeight)
+            // todo: adjust for all shapes
         }
         return shapes
     }
@@ -172,7 +172,7 @@ object PdfUtil {
         pdfPath: String, outputDirectory: String
     ): PdfToImageResultData {
         //saving result data here
-        var shapes: List<Rectangle>
+        var shapes: List<Shape>
         lateinit var pngFile: File
 
         // create a new renderer
@@ -197,7 +197,7 @@ object PdfUtil {
             pngFile = saveBitmapAsPng(
                 bitmap,
                 outputDirectory,
-                "PdfToImage-$pdfName-page-${pageNum}.png"
+                "PdfToImage-$pdfName-page-${pageNum + 1}.png"
             )
 
             // in OpenPdf lib, pages start from 1
