@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 33
@@ -20,4 +21,29 @@ dependencies {
     // OpenPDF
     implementation 'com.github.librepdf:openpdf:1.3.23'
     implementation 'com.github.andob:android-awt:1.0.0'
+}
+
+project.afterEvaluate {
+    publishing {
+        publications {
+            libraryProject(MavenPublication) {
+                setGroupId 'com.github.barteksc.pdfviewer'
+                setArtifactId 'test-release'
+                version '1.2'
+                artifact bundleReleaseAar
+
+                // Add dependencies to the POM file
+                pom.withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+
+                    // Add each dependency to the POM file
+                    def dependencyNode = dependenciesNode.appendNode('dependency')
+                    dependencyNode.appendNode('groupId', 'com.github.hamidrezaamz')
+                    dependencyNode.appendNode('artifactId', 'android-support-pdfium')
+                    dependencyNode.appendNode('version', '1.0.8')
+                    dependencyNode.appendNode('scope', 'compile')
+                }
+            }
+        }
+    }
 }
