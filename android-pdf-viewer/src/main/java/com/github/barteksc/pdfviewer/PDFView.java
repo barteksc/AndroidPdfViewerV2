@@ -208,7 +208,7 @@ public class PDFView extends RelativeLayout {
 
     private boolean fitEachPage = false;
 
-    private int defaultPage = 0;
+    public int defaultPage = 0;
 
     /**
      * True if should scroll through pages vertically instead of horizontally
@@ -321,11 +321,11 @@ public class PDFView extends RelativeLayout {
         setWillNotDraw(false);
     }
 
-    private void load(DocumentSource docSource, String password) {
+    public void load(DocumentSource docSource, String password) {
         load(docSource, password, null);
     }
 
-    private void load(DocumentSource docSource, String password, int[] userPages) {
+    public void load(DocumentSource docSource, String password, int[] userPages) {
 
         if (!recycled) {
             throw new IllegalStateException("Don't call load on a PDF View without recycling it first.");
@@ -1175,7 +1175,7 @@ public class PDFView extends RelativeLayout {
         return zoom != minZoom;
     }
 
-    private void setDefaultPage(int defaultPage) {
+    public void setDefaultPage(int defaultPage) {
         this.defaultPage = defaultPage;
     }
 
@@ -1524,7 +1524,7 @@ public class PDFView extends RelativeLayout {
 
         private LinkHandler linkHandler = new DefaultLinkHandler(PDFView.this);
 
-        private int defaultPage = 0;
+        public int defaultPage = 0;
 
         private boolean swipeHorizontal = false;
 
