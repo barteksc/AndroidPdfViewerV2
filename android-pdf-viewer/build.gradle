@@ -3,8 +3,7 @@ apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 33
-
+    compileSdk 33
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 33
@@ -23,26 +22,20 @@ dependencies {
     implementation 'com.github.andob:android-awt:1.0.0'
 }
 
-project.afterEvaluate {
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
+
+afterEvaluate {
     publishing {
         publications {
-            libraryProject(MavenPublication) {
-                setGroupId 'com.github.barteksc.pdfviewer'
-                setArtifactId 'test-release'
-                version '1.3'
+            release(MavenPublication) {
+                setGroupId 'com.github.VERO-Digital-Solutions'
+                setArtifactId 'AndroidPdfViewerV2'
+                version '1.0'
+                artifact androidSourcesJar
                 artifact bundleReleaseAar
-
-                // Add dependencies to the POM file
-                pom.withXml {
-                    def dependenciesNode = asNode().appendNode('dependencies')
-
-                    // Add each dependency to the POM file
-                    def dependencyNode = dependenciesNode.appendNode('dependency')
-                    dependencyNode.appendNode('groupId', 'com.github.hamidrezaamz')
-                    dependencyNode.appendNode('artifactId', 'android-support-pdfium')
-                    dependencyNode.appendNode('version', '1.0.8')
-                    dependencyNode.appendNode('scope', 'compile')
-                }
             }
         }
     }
