@@ -5,18 +5,18 @@ import android.util.Log
 import android.widget.Toast
 
 
-fun Context.toast(text:String) {
+internal fun Context.toast(text:String) {
     Toast.makeText(this, text,Toast.LENGTH_LONG ).show()
 }
 
-fun logDebug(tag:String = "" , text:String){
+internal fun logDebug(tag:String = "" , text:String){
     Log.d(tag, text)
 }
 
-fun logInfo(tag:String = "" , text:String){
+internal fun logInfo(tag:String = "" , text:String){
     Log.i(tag, text)
 }
 
-fun logError(tag:String = "" , text:String){
+internal fun logError(tag:String = "" , text:String){
     Log.e(tag, text)
 }
