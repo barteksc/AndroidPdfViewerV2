@@ -317,7 +317,6 @@ object AnnotationManager {
             over.endLayer()
 
 
-
             // Close the PdfStamper
             stamp.close()
             reader.close()
@@ -330,6 +329,86 @@ object AnnotationManager {
 
         return isAdded
     }
+
+    /** Draws a layer with a rectangle annotation to a PDF document with 1 page */
+    @Throws(FileNotFoundException::class, IOException::class)
+    @JvmStatic
+    fun addRectAnnotation(
+//        context: Context,
+        rectCorners: List<PointF>,
+        file:File,
+    ): Boolean {
+        // PDFs wil1 have 1 page (for now)
+        val page = 1
+
+//        val filePath = UriUtils.getPathFromUri(context, currUri)
+//
+//        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
+//        val file = File(filePath)
+        if (!file.exists()) throw FileNotFoundException()
+
+        val referenceHash = StringBuilder()
+            .append(PublicValue.KEY_REFERENCE_HASH)
+            .append(UUID.randomUUID().toString())
+            .toString()
+
+        var isAdded = false
+        try {
+            val inputStream: InputStream = FileInputStream(file)
+            val reader = PdfReader(inputStream)
+            val stamp = PdfStamper(reader, FileOutputStream(file))
+
+            // Create a layer for the annotation
+            val annotationLayer = PdfLayer(referenceHash, stamp.writer)
+
+            // bottom left corner
+            val lowerLeftX = rectCorners[3].x
+            val lowerLeftY = rectCorners[3].y
+
+            // topRightCorner
+            val upperRightX = rectCorners[1].x
+            val upperRightY = rectCorners[1].y
+
+            val rectAnnotation = PdfAnnotation.createSquareCircle(
+                stamp.writer,
+                Rectangle(
+                  lowerLeftX,
+                     lowerLeftY,
+                    upperRightX,
+                    upperRightY
+                ),
+                referenceHash,
+                true
+            )
+            rectAnnotation.apply {
+                setColor(Color.BLUE)
+                put(PdfName.OC, annotationLayer)
+            }
+
+            // add annotation into target page
+            val over = stamp.getOverContent(page)
+            if (over == null) {
+                stamp.close()
+                reader.close()
+                throw java.lang.Exception("GetUnderContent() is null")
+            }
+
+            // Add the annotation to the layer
+            over.beginLayer(annotationLayer)
+            stamp.addAnnotation(rectAnnotation, page)
+            over.endLayer()
+
+            // Close the PdfStamper
+            stamp.close()
+            reader.close()
+
+            isAdded = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return isAdded
+    }
+
 
     /** Draws a layer with a line and a link annotation to the PDF document */
     @Throws(FileNotFoundException::class, IOException::class)

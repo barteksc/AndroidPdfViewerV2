@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import androidx.annotation.WorkerThread
 import com.github.barteksc.pdfviewer.util.logDebug
 import com.lowagie.text.pdf.PdfArray
 import com.lowagie.text.pdf.PdfDictionary
@@ -18,6 +19,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import kotlin.properties.Delegates
 
 object PdfUtil {
 
@@ -93,7 +95,7 @@ object PdfUtil {
         val reader = PdfReader(inputStream)
 
         // read annotations for the given page
-        var page: PdfDictionary = reader.getPageN(pageNum)
+        val page: PdfDictionary = reader.getPageN(pageNum)
         val annots: PdfArray? = page.getAsArray(PdfName.ANNOTS)
         if (annots == null) {
             logDebug(TAG, "Annotations array for page $pageNum is null")
@@ -174,6 +176,7 @@ object PdfUtil {
         //saving result data here
         var shapes: List<Shape>
         lateinit var pngFile: File
+        var pageHeight by Delegates.notNull<Int>()
 
         // create a new renderer
         val renderer = PdfRenderer(getSeekableFileDescriptor(pdfPath))
@@ -200,6 +203,9 @@ object PdfUtil {
                 "PdfToImage-$pdfName-page-${pageNum + 1}.png"
             )
 
+            // save page height
+            pageHeight = page.height
+
             // in OpenPdf lib, pages start from 1
             val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum + 1)
 
@@ -210,7 +216,7 @@ object PdfUtil {
 
         }
 
-        return PdfToImageResultData(pngFile, shapes)
+        return PdfToImageResultData(File(pdfPath), pngFile, pageHeight , shapes as List<Rectangle>)
     }
 
     private fun getSeekableFileDescriptor(pdfPath: String): ParcelFileDescriptor {
@@ -238,6 +244,31 @@ object PdfUtil {
     private fun extractFileNameFromPath(filePath: String): String {
         val file = File(filePath)
         return file.nameWithoutExtension
+    }
+
+    @JvmStatic
+    private fun convertPngShapesToPdfAnnotations(
+        shapes: List<Rectangle>,
+        pageHeight: Int,
+    ): List<Annotation> {
+
+        return shapes.map { it.toAnnotation(pageHeight) }
+    }
+
+    @JvmStatic
+    @WorkerThread
+    fun drawPngShapesToPdf(
+        shapes: List<Rectangle>,
+        pageHeight: Int,
+       file:File,
+    ) {
+        val annotations = convertPngShapesToPdfAnnotations(shapes, pageHeight)
+
+        annotations.forEach { annotation ->
+            if (annotation.type == "SQUARE") {
+                AnnotationManager.addRectAnnotation( annotation.rectCorners, file)
+            }
+        }
     }
 
 }

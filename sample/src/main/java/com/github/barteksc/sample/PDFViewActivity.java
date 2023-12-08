@@ -42,6 +42,8 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
 import com.github.barteksc.pdfviewer.annotation.core.PdfToImageResultData;
 import com.github.barteksc.pdfviewer.annotation.core.PdfUtil;
+import com.github.barteksc.pdfviewer.annotation.core.Rectangle;
+import com.github.barteksc.pdfviewer.annotation.core.RectangleKt;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -51,7 +53,6 @@ import com.github.barteksc.pdfviewer.listener.OnPageErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnTapListener;
 import com.github.barteksc.pdfviewer.model.LinkTapEvent;
 import com.github.barteksc.pdfviewer.scroll.DefaultScrollHandle;
-import com.github.barteksc.pdfviewer.util.DebugUtilKt;
 import com.github.barteksc.pdfviewer.util.PublicValue;
 import com.github.barteksc.pdfviewer.util.UriUtils;
 import com.google.android.material.snackbar.Snackbar;
@@ -156,7 +157,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     private void displayFileFromUri() {
 
         if (currUri == null) {
-            DebugUtilKt.toast(this, "currUri is null");
+            com.github.barteksc.sample.DebugUtilKt.toast(this, "currUri is null");
             return;
         }
 
@@ -280,11 +281,15 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
             try {
                 // testing converting pdf to image, passing the result data
 //                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-                String testFilePath = "/storage/emulated/0/Download/simple-pdf-single-page.pdf";
+                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
 //                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
                 String imageOutputDirectory = "/storage/emulated/0/Download/";
                 PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, imageOutputDirectory);
                 Log.d(TAG, "onLongPress: result data is " + result);
+
+                List<Rectangle> testModifiedShapesList = RectangleKt.getMockedData();
+
+                PdfUtil.drawPngShapesToPdf( testModifiedShapesList, result.getPageHeight(), result.getOriginalPdfFile());
                 boolean isAdded = true;
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
@@ -299,7 +304,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 } else {
                     Toast.makeText(this, "Annotation couldn't be added", Toast.LENGTH_LONG).show();
                 }
-                DebugUtilKt.logInfo(TAG, "addAnnotation: isAdded = " + isAdded);
+                com.github.barteksc.sample.DebugUtilKt.logInfo(TAG, "addAnnotation: isAdded = " + isAdded);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -316,9 +321,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 if (isRemoved) {
                     configurator.refresh(pdfView.getCurrentPage()); // refresh view
                 } else {
-                    DebugUtilKt.toast(this, "Annotation couldn't be removed");
+                    com.github.barteksc.sample.DebugUtilKt.toast(this, "Annotation couldn't be removed");
                 }
-                DebugUtilKt.logInfo(TAG, "removeAnnotation: isRemoved = " + isRemoved);
+                com.github.barteksc.sample.DebugUtilKt.logInfo(TAG, "removeAnnotation: isRemoved = " + isRemoved);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -349,4 +354,5 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     public void onError(Throwable t) {
         DebugUtilKt.toast(this, Objects.requireNonNull(t.getMessage()));
     }
+
 }
