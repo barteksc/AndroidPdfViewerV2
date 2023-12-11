@@ -280,7 +280,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         new Handler().post(() -> {
             try {
                 // testing converting pdf to image, passing the result data
-//                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
                 String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
 //                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
                 String imageOutputDirectory = "/storage/emulated/0/Download/";
