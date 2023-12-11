@@ -282,16 +282,14 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                 // testing converting pdf to image, passing the result data
 //                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
                 String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-                String testAnnotatedFilePath = "/storage/emulated/0/Download/simple-pdf_annotated.pdf";
 //                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
                 String imageOutputDirectory = "/storage/emulated/0/Download/";
-                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, null, imageOutputDirectory);
+                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, imageOutputDirectory);
                 Log.d(TAG, "onLongPress: result data is " + result);
 
                 List<Rectangle> testModifiedShapesList = RectangleKt.getMockedData();
-                currUri = Uri.parse(result.getUnmodifiedPdfFile().getPath());
 
-                PdfUtil.drawPngShapesToPdf( testModifiedShapesList, result.getPageHeight(), result.getUnmodifiedPdfFile());
+                PdfUtil.drawPngShapesToPdf( testModifiedShapesList, result.getPageHeight(), result.getOriginalPdfFile());
                 boolean isAdded = true;
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
