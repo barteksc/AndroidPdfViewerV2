@@ -167,11 +167,10 @@ object PdfUtil {
     }
 
 
-    //  may need  @WorkerThread ?
     @JvmStatic
     @Throws(IOException::class)
     fun convertPdfAnnotationsToPngShapes(
-        pdfPath: String, outputDirectory: String
+        pdfFilePath: String, outputDirectory: String
     ): PdfToImageResultData {
         //saving result data here
         var shapes: List<Shape>
@@ -179,7 +178,7 @@ object PdfUtil {
         var pageHeight by Delegates.notNull<Int>()
 
         // create a new renderer
-        val renderer = PdfRenderer(getSeekableFileDescriptor(pdfPath))
+        val renderer = PdfRenderer(getSeekableFileDescriptor(pdfFilePath))
 
         renderer.use { renderer ->
             // assuming the pdf will have only 1 page (for now)
@@ -194,7 +193,7 @@ object PdfUtil {
             // render the page on the bitmap
             page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-            val pdfName = extractFileNameFromPath(pdfPath)
+            val pdfName = extractFileNameFromPath(pdfFilePath)
 
             // save the bitmap as a PNG file
             pngFile = saveBitmapAsPng(
@@ -207,7 +206,7 @@ object PdfUtil {
             pageHeight = page.height
 
             // in OpenPdf lib, pages start from 1
-            val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum + 1)
+            val pdfAnnotations = getAnnotationsFrom(pdfFilePath, pageNum = pageNum + 1)
 
             shapes = getShapesFor(pdfAnnotations, page.height)
 
@@ -216,7 +215,7 @@ object PdfUtil {
 
         }
 
-        return PdfToImageResultData(File(pdfPath), pngFile, pageHeight , shapes as List<Rectangle>)
+        return PdfToImageResultData(File(pdfFilePath), pngFile, pageHeight , shapes as List<Rectangle>)
     }
 
     private fun getSeekableFileDescriptor(pdfPath: String): ParcelFileDescriptor {

@@ -334,17 +334,12 @@ object AnnotationManager {
     @Throws(FileNotFoundException::class, IOException::class)
     @JvmStatic
     fun addRectAnnotation(
-//        context: Context,
         rectCorners: List<PointF>,
         file:File,
     ): Boolean {
         // PDFs wil1 have 1 page (for now)
         val page = 1
 
-//        val filePath = UriUtils.getPathFromUri(context, currUri)
-//
-//        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
-//        val file = File(filePath)
         if (!file.exists()) throw FileNotFoundException()
 
         val referenceHash = StringBuilder()
