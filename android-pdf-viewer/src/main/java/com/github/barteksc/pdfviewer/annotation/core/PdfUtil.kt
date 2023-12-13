@@ -177,7 +177,7 @@ object PdfUtil {
     @JvmStatic
     @Throws(IOException::class)
     fun convertPdfAnnotationsToPngShapes(
-        unmodifiedPdfPath: String, modifiedPdfFilePath: String? = null, outputDirectory: String
+        pdfPath: String, outputDirectory: String
     ): PdfToImageResultData {
         // test
         //saving result data here
@@ -185,19 +185,8 @@ object PdfUtil {
         lateinit var pngFile: File
         var pageHeight by Delegates.notNull<Int>()
 
-        val unmodifiedPdfFile = File(unmodifiedPdfPath)
-
-        // If this is the first time using the unmodified file, create a copy.
-        // Otherwise, use the passed path to the annotated file
-        val annotatedPdfFile = if (modifiedPdfFilePath == null) {
-            File(unmodifiedPdfFile.path + "_annotated")
-        } else {
-            File(modifiedPdfFilePath)
-        }
-        unmodifiedPdfFile.copyTo(annotatedPdfFile, overwrite = true);
-
         // create a new renderer
-        val renderer = PdfRenderer(getSeekableFileDescriptor(annotatedPdfFile.path))
+        val renderer = PdfRenderer(getSeekableFileDescriptor(pdfPath))
 
         renderer.use { renderer ->
             // assuming the pdf will have only 1 page (for now)
@@ -212,7 +201,7 @@ object PdfUtil {
             // render the page on the bitmap
             page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
-            val pdfName = extractFileNameFromPath(unmodifiedPdfPath)
+            val pdfName = extractFileNameFromPath(pdfPath)
 
             // save the bitmap as a PNG file
             pngFile = saveBitmapAsPng(
@@ -225,7 +214,7 @@ object PdfUtil {
             pageHeight = page.height
 
             // in OpenPdf lib, pages start from 1
-            val pdfAnnotations = getAnnotationsFrom(annotatedPdfFile.path, pageNum = pageNum + 1)
+            val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum + 1)
 
             shapes = getShapesFor(pdfAnnotations, page.height)
 
@@ -234,14 +223,7 @@ object PdfUtil {
 
         }
 
-        return PdfToImageResultData(
-            unmodifiedPdfFile,
-            annotatedPdfFile,
-            pngFile,
-            pageHeight,
-            shapes as List<Rectangle>
-        )
-
+        return PdfToImageResultData(File(pdfPath), pngFile, pageHeight , shapes as List<Rectangle>)
     }
 
     private fun getSeekableFileDescriptor(pdfPath: String): ParcelFileDescriptor {
@@ -285,13 +267,13 @@ object PdfUtil {
     fun drawPngShapesToPdf(
         shapes: List<Rectangle>,
         pageHeight: Int,
-        file: File,
+       file:File,
     ) {
         val annotations = convertPngShapesToPdfAnnotations(shapes, pageHeight)
 
         annotations.forEach { annotation ->
             if (annotation.type == "SQUARE") {
-                AnnotationManager.addRectAnnotation(annotation.rectCorners, file)
+                AnnotationManager.addRectAnnotation( annotation.rectCorners, file)
             }
         }
     }
