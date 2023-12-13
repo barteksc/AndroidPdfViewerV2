@@ -763,4 +763,38 @@ object AnnotationManager {
             throw java.lang.Exception(ex.message)
         }
     }
+
+    /** Removes all annotations from a given PDF file */
+    @JvmStatic
+    @Throws(java.lang.Exception::class)
+    fun removeAnnotationsFromPdf(filePath: String?): Boolean {
+        if (filePath.isNullOrEmpty()) throw java.lang.Exception("Input file is empty")
+        val file = File(filePath)
+        if (!file.exists()) throw java.lang.Exception("Input file does not exist")
+
+        return try {
+            // input stream from file
+            val inputStream: InputStream = FileInputStream(file)
+
+            // we create a reader for a certain document
+            val pdfReader = PdfReader(inputStream)
+
+            // we create a stamper that will copy the document to a new file
+            val pdfStamper = PdfStamper(pdfReader, FileOutputStream(file))
+
+            // the actual removing
+            pdfReader.removeAnnotations()
+
+            // closing PdfStamper will generate the new PDF file
+            pdfStamper.close()
+
+            // close reader
+            pdfReader.close()
+
+            // finish method
+            true
+        } catch (e: Exception) {
+            throw Exception(e.message)
+        }
+    }
 }

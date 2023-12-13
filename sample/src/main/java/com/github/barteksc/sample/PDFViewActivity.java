@@ -40,10 +40,6 @@ import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
-import com.github.barteksc.pdfviewer.annotation.core.PdfToImageResultData;
-import com.github.barteksc.pdfviewer.annotation.core.PdfUtil;
-import com.github.barteksc.pdfviewer.annotation.core.Rectangle;
-import com.github.barteksc.pdfviewer.annotation.core.RectangleKt;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -280,23 +276,28 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         new Handler().post(() -> {
             try {
                 // testing converting pdf to image, passing the result data
-                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-                String testAnnotatedFilePath = "/storage/emulated/0/Download/simple-pdf_annotated.pdf";
-//                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
-                String imageOutputDirectory = "/storage/emulated/0/Download/";
-                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, null, imageOutputDirectory);
-                Log.d(TAG, "onLongPress: result data is " + result);
+//                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
+//                String testAnnotatedFilePath = "/storage/emulated/0/Download/simple-pdf_annotated.pdf";
+////                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
+//                String imageOutputDirectory = "/storage/emulated/0/Download/";
+//                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, null, imageOutputDirectory);
+//
+//                List<Rectangle> testModifiedShapesList = RectangleKt.getMockedData();
+//                currUri = Uri.parse(result.getUnmodifiedPdfFile().getPath());
+//
+//                PdfUtil.drawPngShapesToPdf( testModifiedShapesList, result.getPageHeight(), result.getUnmodifiedPdfFile());
+//                boolean isAdded = true;
 
-                List<Rectangle> testModifiedShapesList = RectangleKt.getMockedData();
-                currUri = Uri.parse(result.getUnmodifiedPdfFile().getPath());
 
-                PdfUtil.drawPngShapesToPdf( testModifiedShapesList, result.getPageHeight(), result.getUnmodifiedPdfFile());
-                boolean isAdded = true;
+//                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
+//                AnnotationManager.removeAnnotationsFromPdf(testFilePath);
+//                boolean isAdded = true;
+
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
-//                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
+                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
 

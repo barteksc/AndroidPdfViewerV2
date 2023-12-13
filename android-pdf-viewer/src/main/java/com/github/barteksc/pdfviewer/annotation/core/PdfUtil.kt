@@ -8,10 +8,16 @@ import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import androidx.annotation.WorkerThread
 import com.github.barteksc.pdfviewer.util.logDebug
+import com.lowagie.text.Document
 import com.lowagie.text.pdf.PdfArray
+import com.lowagie.text.pdf.PdfCopy
 import com.lowagie.text.pdf.PdfDictionary
+import com.lowagie.text.pdf.PdfDocument
+import com.lowagie.text.pdf.PdfImportedPage
 import com.lowagie.text.pdf.PdfName
+import com.lowagie.text.pdf.PdfPage
 import com.lowagie.text.pdf.PdfReader
+import com.lowagie.text.pdf.PdfStamper
 import com.lowagie.text.pdf.PdfString
 import java.io.File
 import java.io.FileInputStream
@@ -20,6 +26,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import kotlin.properties.Delegates
+
 
 object PdfUtil {
 
