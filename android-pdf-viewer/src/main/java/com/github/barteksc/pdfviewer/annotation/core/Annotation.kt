@@ -9,18 +9,15 @@ data class Annotation(val type: String, val rectCorners: List<PointF>) {
 fun Annotation.toRectangleShape(pageHeight: Int): Rectangle {
 
     // rect's corners mapped to image space
-    val mappedPoints = listOf<PointF>(
+    val mappedPoints = listOf(
         rectCorners[0].convertCoordinatesFrom(pageHeight),
         rectCorners[1].convertCoordinatesFrom(pageHeight),
         rectCorners[2].convertCoordinatesFrom(pageHeight),
         rectCorners[3].convertCoordinatesFrom(pageHeight)
     )
 
-    // rectangle shape's corner points
-    val rectangleShapePoints = mappedPoints.map { it.toPoint() }
-
     // rectangle shape's edges
-    val rectangleShapeEdges = rectangleShapePoints.generateRectangleEdges()
+    val rectangleShapeEdges = mappedPoints.generateRectangleEdges()
 
-    return Rectangle(corners = rectangleShapePoints, edges = rectangleShapeEdges)
+    return Rectangle(corners = mappedPoints, edges = rectangleShapeEdges)
 }

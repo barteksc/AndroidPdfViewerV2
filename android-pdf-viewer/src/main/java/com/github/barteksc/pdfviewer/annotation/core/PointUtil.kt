@@ -13,7 +13,7 @@ fun generateRectangleCoordinates(bottomLeft: PointF, topRight: PointF): List<Poi
     return listOf(topLeft, topRight, bottomRight, bottomLeft)
 }
 
-fun List<Point>.generateRectangleEdges() : List<Edge> {
+fun List<PointF>.generateRectangleEdges() : List<Edge> {
     val edgeTopHorizontal = Edge (this[0], this[1])
     val edgeRightVertical = Edge (this[1], this[2])
     val edgeBottomHorizontal = Edge (this[2], this[3])
@@ -21,5 +21,3 @@ fun List<Point>.generateRectangleEdges() : List<Edge> {
 
     return listOf(edgeTopHorizontal, edgeRightVertical, edgeBottomHorizontal, edgeLeftVertical)
 }
-
-fun PointF.toPoint() = Point(x, y)

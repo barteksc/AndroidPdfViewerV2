@@ -1,22 +1,24 @@
 package com.github.barteksc.pdfviewer.annotation.core
 
+import android.graphics.PointF
+
 data class Rectangle(
     override val type: String = "RECTANGLE",
-    override val corners: List<Point>,
+    override val corners: List<PointF>,
     val edges: List<Edge>
 ) : Shape(type, corners)
 
 fun Rectangle.toAnnotation(pageHeight: Int): Annotation {
-    val points = corners.map { it.toPointF().convertCoordinatesFrom(pageHeight) }
+    val points = corners.map { it.convertCoordinatesFrom(pageHeight) }
     return Annotation(type = "SQUARE", rectCorners = points)
 }
 
 fun getMockedData(): List<Rectangle> {
     val corners = listOf(
-        Point(0.606155F, 2.65048F, null),
-        Point(60.60616F, 2.65048F, null),
-        Point(60.60616F, 62.65048F, null),
-        Point(0.606155F, 62.65048F, null)
+        PointF(0.606155F, 2.65048F),
+        PointF(60.60616F, 2.65048F),
+        PointF(60.60616F, 62.65048F),
+        PointF(0.606155F, 62.65048F)
     )
 
     val edges = listOf(

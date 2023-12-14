@@ -198,7 +198,7 @@ object AnnotationManager {
             circleAnnotation.apply {
                 setColor(Color.BLUE)
                 put(PdfName.OC, annotationLayer)
-                put(PdfName.TYPE, PdfName.XOBJECT)
+//                put(PdfName.TYPE, PdfName.XOBJECT)
             }
 
             val linkAnnotation = PdfAnnotation(
@@ -335,7 +335,7 @@ object AnnotationManager {
     @JvmStatic
     fun addRectAnnotation(
         rectCorners: List<PointF>,
-        file:File,
+        file: File,
     ): Boolean {
         // PDFs wil1 have 1 page (for now)
         val page = 1
@@ -367,8 +367,8 @@ object AnnotationManager {
             val rectAnnotation = PdfAnnotation.createSquareCircle(
                 stamp.writer,
                 Rectangle(
-                  lowerLeftX,
-                     lowerLeftY,
+                    lowerLeftX,
+                    lowerLeftY,
                     upperRightX,
                     upperRightY
                 ),

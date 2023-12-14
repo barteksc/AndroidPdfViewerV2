@@ -1,3 +1,5 @@
 package com.github.barteksc.pdfviewer.annotation.core
 
-data class Edge (val start : Point, val end : Point)
+import android.graphics.PointF
+
+data class Edge (val start : PointF, val end : PointF)
