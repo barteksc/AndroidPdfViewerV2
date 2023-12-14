@@ -1,6 +1,7 @@
-package com.github.barteksc.pdfviewer.annotation.core
+package com.github.barteksc.pdfviewer.annotation.core.shapes
 
 import android.graphics.PointF
+import com.github.barteksc.pdfviewer.annotation.core.Annotation
 
 data class Rectangle(
     override val type: String = "RECTANGLE",

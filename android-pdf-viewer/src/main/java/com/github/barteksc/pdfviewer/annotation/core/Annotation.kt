@@ -1,6 +1,9 @@
 package com.github.barteksc.pdfviewer.annotation.core
 
 import android.graphics.PointF
+import com.github.barteksc.pdfviewer.annotation.core.shapes.Rectangle
+import com.github.barteksc.pdfviewer.annotation.core.shapes.convertCoordinatesFrom
+import com.github.barteksc.pdfviewer.annotation.core.shapes.generateRectangleEdges
 
 // todo : use enum
 data class Annotation(val type: String, val rectCorners: List<PointF>) {

@@ -5,6 +5,10 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import com.github.barteksc.pdfviewer.annotation.core.shapes.Rectangle
+import com.github.barteksc.pdfviewer.annotation.core.shapes.Shape
+import com.github.barteksc.pdfviewer.annotation.core.shapes.generateRectangleCoordinates
+import com.github.barteksc.pdfviewer.annotation.core.shapes.toAnnotation
 import com.github.barteksc.pdfviewer.util.logDebug
 import com.lowagie.text.pdf.PdfArray
 import com.lowagie.text.pdf.PdfDictionary
@@ -258,7 +262,7 @@ object PdfUtil {
     fun drawPngShapesToPdf(
         shapes: List<Rectangle>,
         pageHeight: Int,
-       file:File,
+        file:File,
     ) {
         val annotations = convertPngShapesToPdfAnnotations(shapes, pageHeight)
 
