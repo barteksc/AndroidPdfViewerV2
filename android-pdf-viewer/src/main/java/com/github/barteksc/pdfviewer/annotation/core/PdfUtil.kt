@@ -141,15 +141,30 @@ object PdfUtil {
                         annotationsList.add(squareAnnotation)
 
                         logDebug(TAG, "Annotation is square")
-                        logDebug(TAG, "Annotation $i on page $pageNum- corner points:")
+                        logDebug(TAG, "Annotation $i on page $pageNum - points:")
                         logDebug(TAG, "squareAnnotationPoints:$squareAnnotationPoints")
 
                     } else if (subtype == PdfName.CIRCLE) {
-                        // todo: check circle's rect
+                        // bottom left
+                        val xBottomLeftPoint = llx
+                        val yBottomLeftPoint = lly
+                        val bottomLeftPoint = PointF(xBottomLeftPoint, yBottomLeftPoint)
+
+                        // top right
+                        val xTopRightPoint = urx
+                        val yTopRightPoint = ury
+                        val topRightPoint = PointF(xTopRightPoint, yTopRightPoint)
+
+                        val circleAnnotationPoints = listOf(bottomLeftPoint, topRightPoint)
+                        val circleAnnotation = Annotation("CIRCLE", circleAnnotationPoints)
+                        annotationsList.add(circleAnnotation)
+
                         logDebug(TAG, "Annotation is circle")
-
+                        logDebug(TAG, "Annotation $i on page $pageNum - points:")
+                        logDebug(TAG, "circleAnnotationPoints:$circleAnnotationPoints")
+                    } else {
+                        logDebug(TAG, "Annotation is not recognised")
                     }
-
                 }
             }
         }
@@ -163,7 +178,11 @@ object PdfUtil {
     ): List<Shape> {
         // convert annotation to shape
         val shapes = pdfAnnotations.map { annotation ->
-            return@map annotation.toRectangleShape(pageHeight)
+            when (annotation.type) {
+                "RECTANGLE" -> return@map annotation.toRectangleShape(pageHeight)
+                "CIRCLE" -> return@map annotation.toCircleShape(pageHeight)
+                else -> throw Exception("Annotation is not recognised")
+            }
             // todo: adjust for all shapes
         }
         return shapes
@@ -219,7 +238,7 @@ object PdfUtil {
 
         }
 
-        return PdfToImageResultData(File(pdfPath), pngFile, pageHeight , shapes as List<Rectangle>)
+        return PdfToImageResultData(File(pdfPath), pngFile, pageHeight, shapes)
     }
 
     private fun getSeekableFileDescriptor(pdfPath: String): ParcelFileDescriptor {
@@ -251,26 +270,26 @@ object PdfUtil {
 
     @JvmStatic
     private fun convertPngShapesToPdfAnnotations(
-        shapes: List<Rectangle>,
+        shapes: List<Shape>,
         pageHeight: Int,
-    ): List<Annotation> {
-
-        return shapes.map { it.toAnnotation(pageHeight) }
-    }
+    ): List<Annotation> = shapes.map { it.toAnnotation(pageHeight) }
 
     @JvmStatic
     fun drawPngShapesToPdf(
-        shapes: List<Rectangle>,
+        shapes: List<Shape>,
         pageHeight: Int,
-        file:File,
+        file: File,
     ) {
         val annotations = convertPngShapesToPdfAnnotations(shapes, pageHeight)
 
         annotations.forEach { annotation ->
-            if (annotation.type == "SQUARE") {
-                AnnotationManager.addRectAnnotation( annotation.rectCorners, file)
+            when (annotation.type) {
+                "SQUARE" -> AnnotationManager.addRectAnnotation(annotation.points, file)
+                "CIRCLE" -> AnnotationManager.addCircleAnnotation(annotation.points, file)
+                else -> throw Exception("Annotation is not recognised")
             }
         }
+
     }
 
 }

@@ -5,16 +5,11 @@ import com.github.barteksc.pdfviewer.annotation.core.Annotation
 
 data class Rectangle(
     override val type: String = "RECTANGLE",
-    override val corners: List<PointF>,
+    override val points: List<PointF>,
     val edges: List<Edge>
-) : Shape(type, corners)
+) : Shape(type, points)
 
-fun Rectangle.toAnnotation(pageHeight: Int): Annotation {
-    val points = corners.map { it.convertCoordinatesFrom(pageHeight) }
-    return Annotation(type = "SQUARE", rectCorners = points)
-}
-
-fun getMockedData(): List<Rectangle> {
+fun getMockedRectangle(): List<Rectangle> {
     val corners = listOf(
         PointF(0.606155F, 2.65048F),
         PointF(60.60616F, 2.65048F),
@@ -33,3 +28,5 @@ fun getMockedData(): List<Rectangle> {
 
     return listOf(rectangle)
 }
+
+data class Edge (val start : PointF, val end : PointF)

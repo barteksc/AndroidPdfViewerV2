@@ -40,6 +40,11 @@ import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
+import com.github.barteksc.pdfviewer.annotation.core.PdfToImageResultData;
+import com.github.barteksc.pdfviewer.annotation.core.PdfUtil;
+import com.github.barteksc.pdfviewer.annotation.core.shapes.CircleKt;
+import com.github.barteksc.pdfviewer.annotation.core.shapes.RectangleKt;
+import com.github.barteksc.pdfviewer.annotation.core.shapes.Shape;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -63,6 +68,7 @@ import org.benjinus.pdfium.Bookmark;
 import org.benjinus.pdfium.Meta;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -280,12 +286,15 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 //                String testAnnotatedFilePath = "/storage/emulated/0/Download/simple-pdf_annotated.pdf";
 ////                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
 //                String imageOutputDirectory = "/storage/emulated/0/Download/";
-//                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, null, imageOutputDirectory);
+//                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, imageOutputDirectory);
 //
-//                List<Rectangle> testModifiedShapesList = RectangleKt.getMockedData();
-//                currUri = Uri.parse(result.getUnmodifiedPdfFile().getPath());
+//                List<Shape> testModifiedShapesList = new ArrayList<>() ;
+//                testModifiedShapesList.addAll(RectangleKt.getMockedRectangle());
+//                testModifiedShapesList.addAll(CircleKt.getMockedCircle());
 //
-//                PdfUtil.drawPngShapesToPdf( testModifiedShapesList, result.getPageHeight(), result.getUnmodifiedPdfFile());
+//                currUri = Uri.parse(result.getOriginalPdfFile().getPath());
+//
+//                PdfUtil.drawPngShapesToPdf( testModifiedShapesList, result.getPageHeight(), result.getOriginalPdfFile());
 //                boolean isAdded = true;
 
 
@@ -295,9 +304,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
-//                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
+                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
-                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
+//                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
 
