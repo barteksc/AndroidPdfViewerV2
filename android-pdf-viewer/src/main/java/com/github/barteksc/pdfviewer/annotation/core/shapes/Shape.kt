@@ -16,7 +16,10 @@ import kotlin.reflect.KClass
         ShapeSubtype(clazz = Rectangle::class, name = "RECTANGLE")
     ]
 )
-abstract class Shape(@Transient open val type: String, @Transient open val points: List<PointF>)
+abstract class Shape(
+    @Transient open val type: String = "",
+    @Transient open val points: List<PointF> = emptyList()
+)
 
 fun Shape.toAnnotation(pageHeight: Int): Annotation {
     return when (this) {

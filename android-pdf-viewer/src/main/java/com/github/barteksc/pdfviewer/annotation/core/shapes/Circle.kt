@@ -5,7 +5,7 @@ import com.github.barteksc.pdfviewer.annotation.core.Annotation
 
 data class Circle(
     override val type: String = "CIRCLE",
-    override val points: List<PointF>,
+    override val points: List<PointF> = emptyList(),
 ) : Shape(type, points)
 
 fun getMockedCircle(): List<Circle> {

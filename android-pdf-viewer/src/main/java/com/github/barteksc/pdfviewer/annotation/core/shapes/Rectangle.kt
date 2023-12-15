@@ -1,12 +1,11 @@
 package com.github.barteksc.pdfviewer.annotation.core.shapes
 
 import android.graphics.PointF
-import com.github.barteksc.pdfviewer.annotation.core.Annotation
 
 data class Rectangle(
     override val type: String = "RECTANGLE",
-    override val points: List<PointF>,
-    val edges: List<Edge>
+    override val points: List<PointF> = emptyList(),
+    val edges: List<Edge> = emptyList()
 ) : Shape(type, points)
 
 fun getMockedRectangle(): List<Rectangle> {
