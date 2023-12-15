@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
         ShapeSubtype(clazz = Rectangle::class, name = "RECTANGLE")
     ]
 )
-abstract class Shape(
+open class Shape(
     @Transient open val type: String = "",
     @Transient open val points: List<PointF> = emptyList()
 )
