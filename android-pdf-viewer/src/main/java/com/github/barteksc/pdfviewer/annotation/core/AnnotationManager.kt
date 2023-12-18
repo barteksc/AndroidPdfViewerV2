@@ -6,6 +6,7 @@ import android.net.Uri
 import android.view.MotionEvent
 import com.github.barteksc.pdfviewer.PDFView
 import com.github.barteksc.pdfviewer.R
+import com.github.barteksc.pdfviewer.annotation.core.shapes.Relations
 import com.github.barteksc.pdfviewer.annotation.ocg.OCGRemover
 import com.github.barteksc.pdfviewer.util.PublicFunction.Companion.getByteFromDrawable
 import com.github.barteksc.pdfviewer.util.PublicValue
@@ -18,13 +19,17 @@ import com.lowagie.text.Rectangle
 import com.lowagie.text.pdf.BaseFont
 import com.lowagie.text.pdf.PdfAction
 import com.lowagie.text.pdf.PdfAnnotation
+import com.lowagie.text.pdf.PdfArray
 import com.lowagie.text.pdf.PdfContentByte
+import com.lowagie.text.pdf.PdfDictionary
 import com.lowagie.text.pdf.PdfGState
 import com.lowagie.text.pdf.PdfImage
 import com.lowagie.text.pdf.PdfLayer
 import com.lowagie.text.pdf.PdfName
+import com.lowagie.text.pdf.PdfNumber
 import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfStamper
+import com.lowagie.text.pdf.PdfString
 import java.awt.Color
 import java.io.File
 import java.io.FileInputStream
@@ -336,6 +341,7 @@ object AnnotationManager {
     fun addRectAnnotation(
         rectCorners: List<PointF>,
         file: File,
+        relations: Relations? = null
     ): Boolean {
         // PDFs wil1 have 1 page (for now)
         val page = 1
@@ -375,9 +381,20 @@ object AnnotationManager {
                 referenceHash,
                 true
             )
+
+            val relationsArray = PdfArray()
+            relations?.documentation?.forEach {
+                val documentationDict = PdfDictionary(PdfName("documentation"))
+                documentationDict.put(PdfName("schemaId"), PdfNumber(it.schemaId))
+                documentationDict.put(PdfName("documentId"), PdfString(it.documentId))
+                relationsArray.add(documentationDict)
+            }
+
             rectAnnotation.apply {
                 setColor(Color.BLUE)
                 put(PdfName.OC, annotationLayer)
+                put(PdfName("relations"), relationsArray)
+
             }
 
             // add annotation into target page

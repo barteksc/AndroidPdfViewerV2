@@ -42,9 +42,6 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
 import com.github.barteksc.pdfviewer.annotation.core.PdfToImageResultData;
 import com.github.barteksc.pdfviewer.annotation.core.PdfUtil;
-import com.github.barteksc.pdfviewer.annotation.core.shapes.CircleKt;
-import com.github.barteksc.pdfviewer.annotation.core.shapes.RectangleKt;
-import com.github.barteksc.pdfviewer.annotation.core.shapes.Shape;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -68,7 +65,6 @@ import org.benjinus.pdfium.Bookmark;
 import org.benjinus.pdfium.Meta;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -302,11 +298,25 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 //                AnnotationManager.removeAnnotationsFromPdf(testFilePath);
 //                boolean isAdded = true;
 
+//                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
+//
+//                List<PointF> corners = new ArrayList<>();
+//                corners.add(new PointF(0.606155F, 2.65048F));
+//                corners.add(new PointF(60.60616F, 2.65048F));
+//                corners.add(new PointF(60.60616F, 62.65048F));
+//                corners.add(new PointF(0.606155F, 62.65048F));
+//
+//                Documentation documentation = new Documentation(16, "583");
+//                List<Documentation> documentations = new ArrayList<>();
+//                documentations.add(documentation);
+//                Relations relations = new Relations(documentations);
+//                boolean isAdded = AnnotationManager.addRectAnnotation(corners, new File(testFilePath), relations);
+
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
-                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
+//                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
-//                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
+                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
 //                boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
 

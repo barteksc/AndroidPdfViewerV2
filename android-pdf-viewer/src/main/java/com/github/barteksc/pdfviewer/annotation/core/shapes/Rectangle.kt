@@ -5,7 +5,8 @@ import android.graphics.PointF
 data class Rectangle(
     override val type: String = "RECTANGLE",
     override val points: List<PointF> = emptyList(),
-    val edges: List<Edge> = emptyList()
+    val edges: List<Edge> = emptyList(),
+    val relations: Relations? = null,
 ) : Shape(type, points)
 
 fun getMockedRectangle(): List<Rectangle> {
@@ -23,7 +24,11 @@ fun getMockedRectangle(): List<Rectangle> {
         Edge(corners[3], corners[0])
     )
 
-    val rectangle = Rectangle("RECTANGLE", corners, edges)
+    val documentation = Documentation(16, "583")
+    val documentations = listOf(documentation)
+    val relations = Relations(documentations)
+
+    val rectangle = Rectangle("RECTANGLE", corners, edges, relations)
 
     return listOf(rectangle)
 }

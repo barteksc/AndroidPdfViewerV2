@@ -5,7 +5,9 @@ import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import com.github.barteksc.pdfviewer.annotation.core.shapes.Documentation
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Rectangle
+import com.github.barteksc.pdfviewer.annotation.core.shapes.Relations
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Shape
 import com.github.barteksc.pdfviewer.annotation.core.shapes.generateRectangleCoordinates
 import com.github.barteksc.pdfviewer.annotation.core.shapes.toAnnotation
@@ -13,6 +15,7 @@ import com.github.barteksc.pdfviewer.util.logDebug
 import com.lowagie.text.pdf.PdfArray
 import com.lowagie.text.pdf.PdfDictionary
 import com.lowagie.text.pdf.PdfName
+import com.lowagie.text.pdf.PdfNumber
 import com.lowagie.text.pdf.PdfReader
 import com.lowagie.text.pdf.PdfString
 import java.io.File
@@ -137,7 +140,37 @@ object PdfUtil {
                         val squareAnnotationPoints =
                             generateRectangleCoordinates(bottomLeftPoint, topRightPoint)
 
-                        val squareAnnotation = Annotation("RECTANGLE", squareAnnotationPoints)
+                        // Extract relations
+                        val documentations = mutableListOf<Documentation>()
+                        val relationsArray: PdfArray? = annotation.getAsArray(PdfName("relations"))
+                        if (relationsArray != null) {
+                            for (j in 0 until relationsArray.size()) {
+                                val documentationDict: PdfDictionary = relationsArray.getAsDict(j)
+                                val schemaId: PdfNumber? =
+                                    documentationDict.getAsNumber(PdfName("schemaId"))
+                                val documentId: PdfString? =
+                                    documentationDict.getAsString(PdfName("documentId"))
+
+                                if (schemaId != null && documentId != null) {
+                                    logDebug(TAG, "Annotation $i - Relations $j:")
+                                    logDebug(TAG, "  schemaId: $schemaId")
+                                    logDebug(TAG, "  documentId: $documentId")
+
+                                    documentations.add(
+                                        Documentation(
+                                            schemaId.intValue().toLong(),
+                                            documentId.toString()
+                                        )
+                                    )
+                                }
+
+                            }
+                        }
+                        val squareAnnotation = Annotation(
+                            "RECTANGLE",
+                            squareAnnotationPoints,
+                            relations = Relations(documentations)
+                        )
                         annotationsList.add(squareAnnotation)
 
                         logDebug(TAG, "Annotation is square")
@@ -188,7 +221,6 @@ object PdfUtil {
         return shapes
     }
 
-
     @JvmStatic
     @Throws(IOException::class)
     fun convertPdfAnnotationsToPngShapes(
@@ -232,6 +264,7 @@ object PdfUtil {
             val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum + 1)
 
             shapes = getShapesFor(pdfAnnotations, page.height)
+            logDebug("rels", "shapes:$shapes")
 
             // close the page
             page.close()
@@ -284,7 +317,12 @@ object PdfUtil {
 
         annotations.forEach { annotation ->
             when (annotation.type) {
-                "SQUARE" -> AnnotationManager.addRectAnnotation(annotation.points, file)
+                "SQUARE" -> AnnotationManager.addRectAnnotation(
+                    annotation.points,
+                    file,
+                    annotation.relations
+                )
+
                 "CIRCLE" -> AnnotationManager.addCircleAnnotation(annotation.points, file)
                 else -> throw Exception("Annotation is not recognised")
             }
