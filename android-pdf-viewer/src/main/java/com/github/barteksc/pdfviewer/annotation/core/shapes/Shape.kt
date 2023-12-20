@@ -33,7 +33,8 @@ fun Shape.toRectangleAnnotation(pageHeight: Int): Annotation {
     val points = points.map { it.convertCoordinatesFrom(pageHeight) }
     return Annotation(
         type = "SQUARE",
-        points = points
+        points = points,
+        relations = (this as Rectangle).relations
     )
 }
 
