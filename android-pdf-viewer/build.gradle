@@ -19,10 +19,11 @@ dependencies {
 
     // OpenPDF
     implementation 'com.github.librepdf:openpdf:1.3.23'
-    implementation 'com.github.andob:android-awt:1.0.0'
+    implementation 'com.github.andob:android-awt:1.0.1'
 
-    // Gson
+    // For deserializing shape classes, converting them to JSON string
     implementation 'com.google.code.gson:gson:2.8.9'
+    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
 }
 
 task androidSourcesJar(type: Jar) {
@@ -36,7 +37,7 @@ afterEvaluate {
             release(MavenPublication) {
                 setGroupId 'com.github.VERO-Digital-Solutions'
                 setArtifactId 'AndroidPdfViewerV2'
-                version '1.0'
+                version '1.0.0'
                 artifact androidSourcesJar
                 artifact bundleReleaseAar
                 // Add dependencies to the POM file

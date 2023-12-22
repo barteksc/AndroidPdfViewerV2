@@ -277,40 +277,10 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
-                // testing converting pdf to image, passing the result data
-//                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-//                String testAnnotatedFilePath = "/storage/emulated/0/Download/simple-pdf_annotated.pdf";
-////                String testPdfFilePath2 = "/storage/emulated/0/Download/foo.pdf";
-//                String imageOutputDirectory = "/storage/emulated/0/Download/";
-//                PdfToImageResultData result = PdfUtil.convertPdfAnnotationsToPngShapes(testFilePath, imageOutputDirectory);
-//
-//                List<Shape> testModifiedShapesList = new ArrayList<>() ;
-//                testModifiedShapesList.addAll(RectangleKt.getMockedRectangle());
-//                testModifiedShapesList.addAll(CircleKt.getMockedCircle());
-//
-//                currUri = Uri.parse(result.getOriginalPdfFile().getPath());
-//
-//                PdfUtil.drawPngShapesToPdf( testModifiedShapesList, result.getPageHeight(), result.getOriginalPdfFile());
-//                boolean isAdded = true;
-
-
-//                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-//                AnnotationManager.removeAnnotationsFromPdf(testFilePath);
-//                boolean isAdded = true;
-
-//                String testFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-//
-//                List<PointF> corners = new ArrayList<>();
-//                corners.add(new PointF(0.606155F, 2.65048F));
-//                corners.add(new PointF(60.60616F, 2.65048F));
-//                corners.add(new PointF(60.60616F, 62.65048F));
-//                corners.add(new PointF(0.606155F, 62.65048F));
-//
-//                Documentation documentation = new Documentation(16, "583");
-//                List<Documentation> documentations = new ArrayList<>();
-//                documentations.add(documentation);
-//                Relations relations = new Relations(documentations);
-//                boolean isAdded = AnnotationManager.addRectAnnotation(corners, new File(testFilePath), relations);
+                String testPdfFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
+                String testOutputDirectory = "/storage/emulated/0/Download/";
+                PdfToImageResultData resultData = PdfUtil.getPdfToImageResultData(testPdfFilePath, testOutputDirectory);
+                PdfUtil.getResultPdf(resultData.getPdfFile(), resultData.getPageHeight(), resultData.getJsonShapes());
 
 
 //                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);

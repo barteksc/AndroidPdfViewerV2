@@ -7,11 +7,20 @@ import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Documentation
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Rectangle
+import com.github.barteksc.pdfviewer.annotation.core.shapes.RectangleTypeAdapter
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Relations
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Shape
 import com.github.barteksc.pdfviewer.annotation.core.shapes.generateRectangleCoordinates
+import com.github.barteksc.pdfviewer.annotation.core.shapes.mapJsonStringToPdfShapes
+import com.github.barteksc.pdfviewer.annotation.core.shapes.mapPdfShapesToJsonString
 import com.github.barteksc.pdfviewer.annotation.core.shapes.toAnnotation
 import com.github.barteksc.pdfviewer.util.logDebug
+import com.github.salomonbrys.kotson.jsonNull
+import com.github.salomonbrys.kotson.jsonObject
+import com.github.salomonbrys.kotson.toJsonArray
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
 import com.lowagie.text.pdf.PdfArray
 import com.lowagie.text.pdf.PdfDictionary
 import com.lowagie.text.pdf.PdfName
@@ -26,7 +35,6 @@ import java.io.IOException
 import java.io.InputStream
 import kotlin.properties.Delegates
 
-
 object PdfUtil {
 
     private val TAG: String = PdfUtil.javaClass.simpleName
@@ -34,7 +42,7 @@ object PdfUtil {
     /** Extract PDF extras from the annotations for the given PDF file path */
     @Throws(IOException::class)
     @JvmStatic
-    fun getAnnotationsExtra(filePath: String) {
+    private fun getAnnotationsExtra(filePath: String) {
         logDebug(TAG, "file path is: $filePath")
 
         if (filePath.isEmpty()) throw java.lang.Exception("Input file is empty")
@@ -81,10 +89,33 @@ object PdfUtil {
         }
     }
 
+    /** Uses the passed PDF file to create a PNG image from the first page,
+     *  maps the PDF annotations to shapes that will be saved as json string
+     *  */
+    @JvmStatic
+    fun getPdfToImageResultData(
+        pdfFilePath: String,
+        outputDirectory: String
+    ): PdfToImageResultData {
+        // (PDF, annotations) -> (PNG, shapes)
+        val resultData = convertPdfAnnotationsToPngShapes(pdfFilePath, outputDirectory)
+        // Remove annotations from the PDF so we can draw shapes from MeasureLib on the same PDF
+        AnnotationManager.removeAnnotationsFromPdf(pdfFilePath)
+        return resultData
+    }
+
+
+    /** Maps shapes to annotations and draws them to the given PDF */
+    @JvmStatic
+    fun getResultPdf(pdfFile: File, pdfPageHeight: Int, jsonShapes: String) {
+        val shapes = mapJsonStringToPdfShapes(jsonShapes)
+        drawPngShapesToPdf(pdfFile, pdfPageHeight, shapes)
+    }
+
     /** Extract the annotations for the given PDF file path and page number */
     @Throws(IOException::class)
     @JvmStatic
-    fun getAnnotationsFrom(filePath: String, pageNum: Int): List<Annotation> {
+    private fun getAnnotationsFrom(filePath: String, pageNum: Int): List<Annotation> {
         logDebug(TAG, "file path is: $filePath")
 
         if (filePath.isEmpty()) throw Exception("Input file is empty")
@@ -205,6 +236,8 @@ object PdfUtil {
         return annotationsList
     }
 
+    /** Map annotations to shapes,
+     *  using the page height when converting between PDF space and image space*/
     private fun getShapesFor(
         pdfAnnotations: List<Annotation>,
         pageHeight: Int
@@ -221,57 +254,61 @@ object PdfUtil {
         return shapes
     }
 
+    /** Use the passed PDF file path to map the PDF page to PNG image and map PDF annotations to image shapes,
+     *  save the PNG image to the given output directory
+     */
     @JvmStatic
     @Throws(IOException::class)
-    fun convertPdfAnnotationsToPngShapes(
+    private fun convertPdfAnnotationsToPngShapes(
         pdfPath: String, outputDirectory: String
     ): PdfToImageResultData {
-        // test
-        //saving result data here
+        // Saving result data here
         var shapes: List<Shape>
         lateinit var pngFile: File
         var pageHeight by Delegates.notNull<Int>()
+        lateinit var jsonShapes: String
 
-        // create a new renderer
+        // Create a new renderer
         val renderer = PdfRenderer(getSeekableFileDescriptor(pdfPath))
 
         renderer.use { renderer ->
-            // assuming the pdf will have only 1 page (for now)
+            // Assuming the pdf will have only 1 page (for now)
             val pageNum = 0
             val page = renderer.openPage(pageNum)
 
-            // create a bitmap
+            // Create a bitmap
             val bitmap = Bitmap.createBitmap(page.width, page.height, Bitmap.Config.ARGB_8888)
-            // ensure white background
+            // Ensure white background
             bitmap.eraseColor(Color.WHITE)
 
-            // render the page on the bitmap
+            // Render the page on the bitmap
             page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
 
             val pdfName = extractFileNameFromPath(pdfPath)
 
-            // save the bitmap as a PNG file
+            // Save the bitmap as a PNG file
             pngFile = saveBitmapAsPng(
                 bitmap,
                 outputDirectory,
                 "PdfToImage-$pdfName-page-${pageNum + 1}.png"
             )
 
-            // save page height
+            // Save page height
             pageHeight = page.height
 
-            // in OpenPdf lib, pages start from 1
+            // In OpenPdf lib, pages start from 1
             val pdfAnnotations = getAnnotationsFrom(pdfPath, pageNum = pageNum + 1)
 
             shapes = getShapesFor(pdfAnnotations, page.height)
-            logDebug("rels", "shapes:$shapes")
 
-            // close the page
+            // Map to JSON string so we can pass them to MeasureLib
+            jsonShapes = mapPdfShapesToJsonString(shapes as List<Rectangle>)
+
+            // Close the page
             page.close()
-
         }
 
-        return PdfToImageResultData(File(pdfPath), pngFile, pageHeight, shapes)
+        return PdfToImageResultData(File(pdfPath), pngFile, pageHeight, jsonShapes)
     }
 
     private fun getSeekableFileDescriptor(pdfPath: String): ParcelFileDescriptor {
@@ -308,26 +345,23 @@ object PdfUtil {
     ): List<Annotation> = shapes.map { it.toAnnotation(pageHeight) }
 
     @JvmStatic
-    fun drawPngShapesToPdf(
+    private fun drawPngShapesToPdf(
+        pdfFile: File, pageHeight: Int,
         shapes: List<Shape>,
-        pageHeight: Int,
-        file: File,
     ) {
         val annotations = convertPngShapesToPdfAnnotations(shapes, pageHeight)
-
         annotations.forEach { annotation ->
             when (annotation.type) {
                 "SQUARE" -> AnnotationManager.addRectAnnotation(
                     annotation.points,
-                    file,
+                    pdfFile,
                     annotation.relations
                 )
 
-                "CIRCLE" -> AnnotationManager.addCircleAnnotation(annotation.points, file)
+                "CIRCLE" -> AnnotationManager.addCircleAnnotation(annotation.points, pdfFile)
                 else -> throw Exception("Annotation is not recognised")
             }
         }
 
     }
-
 }
