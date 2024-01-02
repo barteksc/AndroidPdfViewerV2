@@ -14,7 +14,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParseException
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
-import kotlin.reflect.KClass
 
 open class Shape(
     @Transient open val type: String = "",

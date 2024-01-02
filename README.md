@@ -1,6 +1,7 @@
 # Changes
 * Update the max zoom level to 60x
 * Add zoom step of 1.75 on double tap until the max zoom level is reached
+* Allow drawing annotations to a PDF document
 
 # Android PdfViewer
 
