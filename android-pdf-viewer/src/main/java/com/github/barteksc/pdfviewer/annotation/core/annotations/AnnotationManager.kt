@@ -1,4 +1,4 @@
-package com.github.barteksc.pdfviewer.annotation.core
+package com.github.barteksc.pdfviewer.annotation.core.annotations
 
 import android.content.Context
 import android.graphics.PointF

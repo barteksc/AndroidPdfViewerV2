@@ -1,4 +1,4 @@
-package com.github.barteksc.pdfviewer.annotation.core
+package com.github.barteksc.pdfviewer.annotation.core.pdf
 
 import java.io.File
 

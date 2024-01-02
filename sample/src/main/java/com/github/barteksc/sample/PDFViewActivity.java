@@ -39,9 +39,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
-import com.github.barteksc.pdfviewer.annotation.core.AnnotationManager;
-import com.github.barteksc.pdfviewer.annotation.core.PdfToImageResultData;
-import com.github.barteksc.pdfviewer.annotation.core.PdfUtil;
+import com.github.barteksc.pdfviewer.annotation.core.annotations.AnnotationManager;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;

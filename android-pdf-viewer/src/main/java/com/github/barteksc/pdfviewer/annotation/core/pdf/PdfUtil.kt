@@ -1,13 +1,16 @@
-package com.github.barteksc.pdfviewer.annotation.core
+package com.github.barteksc.pdfviewer.annotation.core.pdf
 
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.PointF
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import com.github.barteksc.pdfviewer.annotation.core.annotations.Annotation
+import com.github.barteksc.pdfviewer.annotation.core.annotations.AnnotationManager
+import com.github.barteksc.pdfviewer.annotation.core.annotations.toCircleShape
+import com.github.barteksc.pdfviewer.annotation.core.annotations.toRectangleShape
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Documentation
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Rectangle
-import com.github.barteksc.pdfviewer.annotation.core.shapes.RectangleTypeAdapter
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Relations
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Shape
 import com.github.barteksc.pdfviewer.annotation.core.shapes.generateRectangleCoordinates
@@ -15,12 +18,6 @@ import com.github.barteksc.pdfviewer.annotation.core.shapes.mapJsonStringToPdfSh
 import com.github.barteksc.pdfviewer.annotation.core.shapes.mapPdfShapesToJsonString
 import com.github.barteksc.pdfviewer.annotation.core.shapes.toAnnotation
 import com.github.barteksc.pdfviewer.util.logDebug
-import com.github.salomonbrys.kotson.jsonNull
-import com.github.salomonbrys.kotson.jsonObject
-import com.github.salomonbrys.kotson.toJsonArray
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
-import com.google.gson.reflect.TypeToken
 import com.lowagie.text.pdf.PdfArray
 import com.lowagie.text.pdf.PdfDictionary
 import com.lowagie.text.pdf.PdfName

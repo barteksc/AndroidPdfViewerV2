@@ -1,7 +1,6 @@
 package com.github.barteksc.pdfviewer.annotation.core.shapes
 
 import android.graphics.PointF
-import com.github.barteksc.pdfviewer.annotation.core.Annotation
 
 data class Circle(
     override val type: String = "CIRCLE",

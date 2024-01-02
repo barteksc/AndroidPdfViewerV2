@@ -1,7 +1,7 @@
 package com.github.barteksc.pdfviewer.annotation.core.shapes
 
 import android.graphics.PointF
-import com.github.barteksc.pdfviewer.annotation.core.Annotation
+import com.github.barteksc.pdfviewer.annotation.core.annotations.Annotation
 import com.github.salomonbrys.kotson.jsonNull
 import com.github.salomonbrys.kotson.jsonObject
 import com.github.salomonbrys.kotson.toJsonArray

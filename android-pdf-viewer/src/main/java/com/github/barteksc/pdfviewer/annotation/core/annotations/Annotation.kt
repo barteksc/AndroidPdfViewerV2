@@ -1,4 +1,4 @@
-package com.github.barteksc.pdfviewer.annotation.core
+package com.github.barteksc.pdfviewer.annotation.core.annotations
 
 import android.graphics.PointF
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Circle
