@@ -7,7 +7,6 @@ import com.github.barteksc.pdfviewer.annotation.core.shapes.Relations
 import com.github.barteksc.pdfviewer.annotation.core.shapes.convertCoordinatesFrom
 import com.github.barteksc.pdfviewer.annotation.core.shapes.generateRectangleEdges
 
-// todo : use enum
 data class Annotation(
     val type: String, val points: List<PointF>, val relations: Relations? = null
 )

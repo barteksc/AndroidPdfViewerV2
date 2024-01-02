@@ -7,12 +7,14 @@ import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
 import com.github.barteksc.pdfviewer.annotation.core.annotations.Annotation
 import com.github.barteksc.pdfviewer.annotation.core.annotations.AnnotationManager
+import com.github.barteksc.pdfviewer.annotation.core.annotations.AnnotationType
 import com.github.barteksc.pdfviewer.annotation.core.annotations.toCircleShape
 import com.github.barteksc.pdfviewer.annotation.core.annotations.toRectangleShape
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Documentation
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Rectangle
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Relations
 import com.github.barteksc.pdfviewer.annotation.core.shapes.Shape
+import com.github.barteksc.pdfviewer.annotation.core.shapes.ShapeType
 import com.github.barteksc.pdfviewer.annotation.core.shapes.generateRectangleCoordinates
 import com.github.barteksc.pdfviewer.annotation.core.shapes.mapJsonStringToPdfShapes
 import com.github.barteksc.pdfviewer.annotation.core.shapes.mapPdfShapesToJsonString
@@ -194,8 +196,12 @@ object PdfUtil {
 
                             }
                         }
+                        // why is it "RECTANGLE"
+                        // when creating
+                        // it was rect, but should it be square?
+
                         val squareAnnotation = Annotation(
-                            "RECTANGLE",
+                           AnnotationType.SQUARE.name,
                             squareAnnotationPoints,
                             relations = Relations(documentations)
                         )
@@ -242,7 +248,8 @@ object PdfUtil {
         // convert annotation to shape
         val shapes = pdfAnnotations.map { annotation ->
             when (annotation.type) {
-                "RECTANGLE" -> return@map annotation.toRectangleShape(pageHeight)
+                // it was rect, but should it be square?
+                AnnotationType.SQUARE.name -> return@map annotation.toRectangleShape(pageHeight)
                 "CIRCLE" -> return@map annotation.toCircleShape(pageHeight)
                 else -> throw Exception("Annotation is not recognised")
             }
@@ -348,13 +355,17 @@ object PdfUtil {
         val annotations = convertPngShapesToPdfAnnotations(shapes, pageHeight)
         annotations.forEach { annotation ->
             when (annotation.type) {
-                "SQUARE" -> AnnotationManager.addRectAnnotation(
+                AnnotationType.SQUARE.name -> AnnotationManager.addRectAnnotation(
                     annotation.points,
                     pdfFile,
                     annotation.relations
                 )
 
-                "CIRCLE" -> AnnotationManager.addCircleAnnotation(annotation.points, pdfFile)
+                AnnotationType.CIRCLE.name -> AnnotationManager.addCircleAnnotation(
+                    annotation.points,
+                    pdfFile
+                )
+
                 else -> throw Exception("Annotation is not recognised")
             }
         }

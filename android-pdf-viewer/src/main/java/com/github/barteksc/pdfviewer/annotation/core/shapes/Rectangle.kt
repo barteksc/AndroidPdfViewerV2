@@ -11,19 +11,27 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
 data class Rectangle(
-    override val type: String = "RECTANGLE",
+    override val type: String = ShapeType.RECTANGLE.name,
     override val points: List<PointF> = emptyList(),
     val edges: List<Edge> = emptyList(),
     val relations: Relations? = null,
 ) : Shape(type, points)
 
+fun getMockedRectangleCorners() = listOf(
+    PointF(30.606155F, 22.65048F),
+    PointF(60.60616F, 22.65048F),
+    PointF(60.60616F, 62.65048F),
+    PointF(30.606155F, 62.65048F)
+)
+
+fun getMockedRectangleRelations(): Relations {
+    val documentation = Documentation(16, "583")
+    val documentations = listOf(documentation)
+    return Relations(documentations)
+}
+
 fun getMockedRectangle(): List<Rectangle> {
-    val corners = listOf(
-        PointF(0.606155F, 2.65048F),
-        PointF(60.60616F, 2.65048F),
-        PointF(60.60616F, 62.65048F),
-        PointF(0.606155F, 62.65048F)
-    )
+    val corners = getMockedRectangleCorners()
 
     val edges = listOf(
         Edge(corners[0], corners[1]),
@@ -32,16 +40,14 @@ fun getMockedRectangle(): List<Rectangle> {
         Edge(corners[3], corners[0])
     )
 
-    val documentation = Documentation(16, "583")
-    val documentations = listOf(documentation)
-    val relations = Relations(documentations)
+    val relations = getMockedRectangleRelations()
 
-    val rectangle = Rectangle("RECTANGLE", corners, edges, relations)
+    val rectangle = Rectangle(points = corners, edges = edges, relations = relations)
 
     return listOf(rectangle)
 }
 
-data class Edge (val start : PointF, val end : PointF)
+data class Edge(val start: PointF, val end: PointF)
 
 class RectangleTypeAdapter : JsonSerializer<Rectangle>, JsonDeserializer<Rectangle> {
     override fun serialize(
@@ -72,7 +78,7 @@ class RectangleTypeAdapter : JsonSerializer<Rectangle>, JsonDeserializer<Rectang
         context: JsonDeserializationContext?
     ): Rectangle {
         val jsonObject = json?.asJsonObject
-        val type = jsonObject?.get("type")?.asString ?: "RECTANGLE"
+        val type = jsonObject?.get("type")?.asString ?: ShapeType.RECTANGLE.name
         val corners = context?.deserialize<List<PointF>>(
             jsonObject?.get("points"),
             object : TypeToken<List<PointF>>() {}.type
