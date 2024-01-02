@@ -39,7 +39,8 @@ object PdfUtil {
 
     private val TAG: String = PdfUtil.javaClass.simpleName
 
-    /** Extract PDF extras from the annotations for the given PDF file path */
+    /** Extract PDF extras from the annotations for the given PDF file path.
+     * Check this when linking entities to annotation */
     @Throws(IOException::class)
     @JvmStatic
     private fun getAnnotationsExtra(filePath: String) {
@@ -112,12 +113,11 @@ object PdfUtil {
         drawPngShapesToPdf(pdfFile, pdfPageHeight, shapes)
     }
 
-    /** Extract the annotations for the given PDF file path and page number */
+    /** Extract the annotations for the given PDF file path and page number.
+     * Page number is always 1 for now */
     @Throws(IOException::class)
     @JvmStatic
     private fun getAnnotationsFrom(filePath: String, pageNum: Int): List<Annotation> {
-        logDebug(TAG, "file path is: $filePath")
-
         if (filePath.isEmpty()) throw Exception("Input file is empty")
         val file = File(filePath)
         if (!file.exists()) throw Exception("Input file does not exist")
@@ -156,7 +156,6 @@ object PdfUtil {
                     val urx: Float = rectArray.getAsNumber(2).floatValue()
                     val ury: Float = rectArray.getAsNumber(3).floatValue()
 
-                    // from the extracted coordinates, calculate the rest, based on the annotation type
                     if (subtype == PdfName.SQUARE) {
                         // bottom left
                         val xBottomLeftPoint = llx
@@ -168,6 +167,7 @@ object PdfUtil {
                         val yTopRightPoint = ury
                         val topRightPoint = PointF(xTopRightPoint, yTopRightPoint)
 
+                        // from the extracted coordinates, calculate the rest
                         val squareAnnotationPoints =
                             generateRectangleCoordinates(bottomLeftPoint, topRightPoint)
 
@@ -249,13 +249,12 @@ object PdfUtil {
                 "CIRCLE" -> return@map annotation.toCircleShape(pageHeight)
                 else -> throw Exception("Annotation is not recognised")
             }
-            // todo: adjust for all shapes
         }
         return shapes
     }
 
-    /** Use the passed PDF file path to map the PDF page to PNG image and map PDF annotations to image shapes,
-     *  save the PNG image to the given output directory
+    /** Use the passed PDF file path to map the PDF page to PNG image and
+     *  map PDF annotations to image shapes, save the PNG image to the given output directory
      */
     @JvmStatic
     @Throws(IOException::class)
@@ -362,6 +361,5 @@ object PdfUtil {
                 else -> throw Exception("Annotation is not recognised")
             }
         }
-
     }
 }

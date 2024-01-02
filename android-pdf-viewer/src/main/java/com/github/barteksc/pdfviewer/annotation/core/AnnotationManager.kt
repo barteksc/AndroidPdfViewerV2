@@ -203,7 +203,6 @@ object AnnotationManager {
             circleAnnotation.apply {
                 setColor(Color.BLUE)
                 put(PdfName.OC, annotationLayer)
-//                put(PdfName.TYPE, PdfName.XOBJECT)
             }
 
             val linkAnnotation = PdfAnnotation(
@@ -243,7 +242,8 @@ object AnnotationManager {
         return isAdded
     }
 
-    /** Draws a layer with a rectangle annotation and a link annotation to the PDF document */
+    /** Draws a layer with a rectangle annotation and a link annotation to the PDF document.
+     *  The rectangle is centered to the touched point */
     @Throws(FileNotFoundException::class, IOException::class)
     @JvmStatic
     fun addRectAnnotation(
@@ -321,17 +321,14 @@ object AnnotationManager {
             stamp.addAnnotation(linkAnnotation, page)
             over.endLayer()
 
-
             // Close the PdfStamper
             stamp.close()
             reader.close()
-
 
             isAdded = true
         } catch (ex: Exception) {
             ex.printStackTrace()
         }
-
         return isAdded
     }
 
@@ -382,6 +379,7 @@ object AnnotationManager {
                 true
             )
 
+            // Put relations extra
             val relationsArray = PdfArray()
             relations?.documentation?.forEach {
                 val documentationDict = PdfDictionary(PdfName("documentation"))
@@ -587,14 +585,15 @@ object AnnotationManager {
         return isAdded
     }
 
+    /** Check this if trying to add freehand drawing to PDF */
     @JvmStatic
     fun addLines(
         context: Context,
         currUri: Uri,
         pdfView: PDFView,
     ): Boolean {
-        // Hint: Page Starts From --> 1 In OpenPdf Core
         var page = pdfView.currentPage
+        // Page Starts From 1 In OpenPdf
         page++
 
         val filePath = UriUtils.getPathFromUri(context, currUri)
@@ -622,7 +621,6 @@ object AnnotationManager {
             over.setRGBColorStroke(0, 0, 255)
 
             over.setLineWidth(1f)
-
 
             // drawing lines on the provided "PDF-Test1.pdf"
             // line 1 coordinates - line above letter B
@@ -655,12 +653,11 @@ object AnnotationManager {
             over.moveTo(l3_x1, l3_y1)
             over.lineTo(l3_x2, l3_y2)
 
-            //draw lines
+            // draw lines
             over.stroke()
 
-            // todo: Add reference hash
             // add as layer
-            val wmLayer = PdfLayer("lines-referenceHash", stamp.writer)
+            val wmLayer = PdfLayer("lines", stamp.writer)
             over.beginLayer(wmLayer)
             over.endLayer()
 
@@ -675,7 +672,7 @@ object AnnotationManager {
         return isAdded
     }
 
-    /** Removes annotations from the PDF document */
+    /** Removes annotation from the PDF document */
     @Throws(IOException::class)
     @JvmStatic
     fun removeAnnotation(context: Context, currUri: Uri, referenceHash: String?): Boolean {
@@ -787,7 +784,6 @@ object AnnotationManager {
             OCGHeight = PublicValue.DEFAULT_OCG_HEIGHT
         }
 
-        // get file and FileOutputStream
         if (filePath.isNullOrEmpty()) throw java.lang.Exception("Input file is empty")
         val file = File(filePath)
         if (!file.exists()) throw java.lang.Exception("Input file does not exists")

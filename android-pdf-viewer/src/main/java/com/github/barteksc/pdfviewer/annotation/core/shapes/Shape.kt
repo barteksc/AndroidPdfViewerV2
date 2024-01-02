@@ -15,6 +15,7 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
+// TODO: Check how to deserialize different shapes
 @ShapeType(
     property = "type",
     subtypes = [
@@ -54,6 +55,7 @@ fun Shape.toCircleAnnotation(pageHeight: Int): Annotation {
 @Target(AnnotationTarget.CLASS)
 annotation class ShapeType(val property: String, val subtypes: Array<ShapeSubtype>)
 
+// TODO: Check how to deserialize different shapes
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.CLASS)
 annotation class ShapeSubtype(val clazz: KClass<out Shape>, val name: String)

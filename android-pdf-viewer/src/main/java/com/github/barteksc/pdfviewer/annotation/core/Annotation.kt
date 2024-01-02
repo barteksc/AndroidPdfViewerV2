@@ -13,7 +13,7 @@ data class Annotation(
 )
 
 fun Annotation.toRectangleShape(pageHeight: Int): Rectangle {
-    // rect's corners mapped to image space
+    // rectangle's corners  mapped to image space
     val mappedPoints = listOf(
         points[0].convertCoordinatesFrom(pageHeight),
         points[1].convertCoordinatesFrom(pageHeight),

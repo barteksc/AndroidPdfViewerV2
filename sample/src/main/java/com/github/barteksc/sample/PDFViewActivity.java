@@ -92,7 +92,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     String pdfFileName;
 
     private Uri currUri = null;
-    private String currFilePath = null;
 
 
     @OptionsItem(R.id.pickFile)
@@ -174,7 +173,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
         pdfFileName = getFileName(currUri);
 
-        currFilePath = UriUtils.getPathFromUri(this, currUri);
+        String currFilePath = UriUtils.getPathFromUri(this, currUri);
 
         this.configurator = pdfView.fromUri(currUri)
                 .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)
@@ -272,24 +271,11 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         if (!pdfView.isAnnotationHandlingEnabled()) {
             return;
         }
-        // here we have a long click
         Log.i(TAG, "onLongPress --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
-                String testPdfFilePath = "/storage/emulated/0/Download/simple-pdf.pdf";
-                String testOutputDirectory = "/storage/emulated/0/Download/";
-                PdfToImageResultData resultData = PdfUtil.getPdfToImageResultData(testPdfFilePath, testOutputDirectory);
-                PdfUtil.getResultPdf(resultData.getPdfFile(), resultData.getPageHeight(), resultData.getJsonShapes());
-
-
-//                boolean isAdded = AnnotationManager.addTextAnnotation(this, e, currUri, pdfView);
-//                boolean isAdded = AnnotationManager.addCircleAnnotation(this, e, currUri, pdfView);
-//                boolean isAdded = AnnotationManager.addLineAnnotation(this, e, currUri, pdfView);
                 boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
-//                boolean isAdded = AnnotationManager.addLines(this, currUri, pdfView);
-//                boolean isAdded = AnnotationManager.addImageAnnotation(this, e, currUri, pdfView);
-
                 if (isAdded) {
                     configurator.refresh(pdfView.getCurrentPage());// refresh view
                 } else {
@@ -299,7 +285,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-
         });
     }
 
@@ -324,7 +309,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     @Override
     public boolean onTap(MotionEvent e) {
-        // here we have a tap
         Log.i(TAG, "onTap --> X: " + e.getX() + " | Y: " + e.getY());
         Log.i(TAG, "--------------------------------------------------");
 
@@ -345,5 +329,4 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     public void onError(Throwable t) {
         DebugUtilKt.toast(this, Objects.requireNonNull(t.getMessage()));
     }
-
 }

@@ -43,7 +43,6 @@ fun getMockedRectangle(): List<Rectangle> {
 
 data class Edge (val start : PointF, val end : PointF)
 
-
 class RectangleTypeAdapter : JsonSerializer<Rectangle>, JsonDeserializer<Rectangle> {
     override fun serialize(
         src: Rectangle?,
