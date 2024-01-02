@@ -355,7 +355,7 @@ object PdfUtil {
         val annotations = convertPngShapesToPdfAnnotations(shapes, pageHeight)
         annotations.forEach { annotation ->
             when (annotation.type) {
-                AnnotationType.SQUARE.name -> AnnotationManager.addRectAnnotation(
+                AnnotationType.SQUARE.name -> AnnotationManager.addRectangleAnnotation(
                     annotation.points,
                     pdfFile,
                     annotation.relations

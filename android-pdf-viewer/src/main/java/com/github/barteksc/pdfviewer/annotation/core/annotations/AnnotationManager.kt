@@ -237,7 +237,7 @@ object AnnotationManager {
      *  The rectangle is centered to the touched point */
     @Throws(FileNotFoundException::class, IOException::class)
     @JvmStatic
-    fun addRectAnnotation(
+    fun addRectangleAnnotation(
         context: Context,
         e: MotionEvent,
         currUri: Uri,
@@ -322,7 +322,7 @@ object AnnotationManager {
     /** Draws a layer with a rectangle annotation to a PDF document with 1 page */
     @Throws(FileNotFoundException::class, IOException::class)
     @JvmStatic
-    fun addRectAnnotation(
+    fun addRectangleAnnotation(
         rectCorners: List<PointF>,
         file: File,
         relations: Relations? = null
@@ -413,7 +413,7 @@ object AnnotationManager {
         circlePoints: List<PointF>,
         file: File
     ): Boolean {
-        // PDFs wil1 have 1 page (for now)
+        // PDFs will have 1 page (for now)
         val page = 1
         if (!file.exists()) throw FileNotFoundException()
 

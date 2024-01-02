@@ -15,8 +15,6 @@
  */
 package com.github.barteksc.sample;
 
-import static com.github.barteksc.pdfviewer.annotation.core.shapes.RectangleKt.getMockedRectangle;
-import static com.github.barteksc.pdfviewer.annotation.core.shapes.RectangleKt.getMockedRectangleRelations;
 import static com.github.barteksc.pdfviewer.util.PublicValue.KEY_REQUEST_FILE_PICKER;
 
 import android.annotation.SuppressLint;
@@ -42,10 +40,6 @@ import androidx.core.content.ContextCompat;
 
 import com.github.barteksc.pdfviewer.PDFView;
 import com.github.barteksc.pdfviewer.annotation.core.annotations.AnnotationManager;
-import com.github.barteksc.pdfviewer.annotation.core.pdf.PdfToImageResultData;
-import com.github.barteksc.pdfviewer.annotation.core.pdf.PdfUtil;
-import com.github.barteksc.pdfviewer.annotation.core.shapes.Rectangle;
-import com.github.barteksc.pdfviewer.annotation.core.shapes.RectangleKt;
 import com.github.barteksc.pdfviewer.link.LinkHandler;
 import com.github.barteksc.pdfviewer.listener.OnErrorListener;
 import com.github.barteksc.pdfviewer.listener.OnLoadCompleteListener;
@@ -68,7 +62,6 @@ import org.androidannotations.annotations.ViewById;
 import org.benjinus.pdfium.Bookmark;
 import org.benjinus.pdfium.Meta;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
@@ -280,19 +273,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         Log.i(TAG, "--------------------------------------------------");
         new Handler().post(() -> {
             try {
-                // Test
-//                String testPdfFilePath = "/storage/emulated/0/Download/blank.pdf";
-//                AnnotationManager.addRectAnnotation(RectangleKt.getMockedRectangleCorners(), new File(testPdfFilePath), getMockedRectangleRelations());
-//
-//                String testOutputDirectory = "/storage/emulated/0/Download/";
-//                PdfToImageResultData resultData = PdfUtil.getPdfToImageResultData(testPdfFilePath, testOutputDirectory);
-//                PdfUtil.getResultPdf(resultData.getPdfFile(), resultData.getPageHeight(), resultData.getJsonShapes());
-//
-//                boolean isAdded = true;
-
-                boolean isAdded = AnnotationManager.addRectAnnotation(this, e, currUri, pdfView);
+                boolean isAdded = AnnotationManager.addRectangleAnnotation(this, e, currUri, pdfView);
                 if (isAdded) {
-                    configurator.refresh(pdfView.getCurrentPage());// refresh view
+                    configurator.refresh(pdfView.getCurrentPage()); // refresh view
                 } else {
                     Toast.makeText(this, "Annotation couldn't be added", Toast.LENGTH_LONG).show();
                 }
