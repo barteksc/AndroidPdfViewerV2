@@ -85,7 +85,7 @@ object AnnotationManager {
                     upperRightX,
                     upperRightY
                 ),
-                referenceHash,
+                "",
                 true
             )
 
@@ -168,7 +168,7 @@ object AnnotationManager {
                     upperRightX,
                     upperRightY
                 ),
-                referenceHash,
+                "",
                 false
             )
             circleAnnotation.apply {
