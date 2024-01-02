@@ -41,8 +41,7 @@ import java.util.UUID
 
 
 object AnnotationManager {
-    val TAG = AnnotationManager.javaClass.simpleName
-    // TODO: extract file check in a function
+    private val TAG = AnnotationManager.javaClass.simpleName
 
     /** Draws a layer with a text annotation and a link annotation to the PDF document
      * WIP - text needs to be centered to the touched point,
@@ -59,11 +58,7 @@ object AnnotationManager {
         var page = pdfView.currentPage
         page++
 
-        val filePath = UriUtils.getPathFromUri(context, currUri)
-
-        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
-        val file = File(filePath)
-        if (!file.exists()) throw FileNotFoundException()
+        val file = getFileFromUri(context, currUri)
 
         val referenceHash = StringBuilder()
             .append(PublicValue.KEY_REFERENCE_HASH)
@@ -166,11 +161,7 @@ object AnnotationManager {
         var page = pdfView.currentPage
         page++
 
-        val filePath = UriUtils.getPathFromUri(context, currUri)
-
-        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
-        val file = File(filePath)
-        if (!file.exists()) throw FileNotFoundException()
+        val file = getFileFromUri(context, currUri)
 
         val referenceHash = StringBuilder()
             .append(PublicValue.KEY_REFERENCE_HASH)
@@ -256,11 +247,7 @@ object AnnotationManager {
         var page = pdfView.currentPage
         page++
 
-        val filePath = UriUtils.getPathFromUri(context, currUri)
-
-        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
-        val file = File(filePath)
-        if (!file.exists()) throw FileNotFoundException()
+        val file = getFileFromUri(context, currUri)
 
         val referenceHash = StringBuilder()
             .append(PublicValue.KEY_REFERENCE_HASH)
@@ -506,11 +493,7 @@ object AnnotationManager {
         var page = pdfView.currentPage
         page++
 
-        val filePath = UriUtils.getPathFromUri(context, currUri)
-
-        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
-        val file = File(filePath)
-        if (!file.exists()) throw FileNotFoundException()
+        val file = getFileFromUri(context, currUri)
 
         val referenceHash = StringBuilder()
             .append(PublicValue.KEY_REFERENCE_HASH)
@@ -596,12 +579,7 @@ object AnnotationManager {
         // Page Starts From 1 In OpenPdf
         page++
 
-        val filePath = UriUtils.getPathFromUri(context, currUri)
-
-        // get file and FileOutputStream
-        if (filePath.isNullOrEmpty()) throw FileNotFoundException()
-        val file = File(filePath)
-        if (!file.exists()) throw FileNotFoundException()
+        val file = getFileFromUri(context, currUri)
 
         var isAdded = false
         try {
@@ -882,5 +860,18 @@ object AnnotationManager {
         } catch (e: Exception) {
             throw Exception(e.message)
         }
+    }
+
+    @Throws(FileNotFoundException::class)
+    fun getFileFromUri(context: Context, currUri: Uri): File {
+        val filePath = UriUtils.getPathFromUri(context, currUri)
+        if (filePath.isNullOrEmpty()) {
+            throw FileNotFoundException()
+        }
+        val file = File(filePath)
+        if (!file.exists()) {
+            throw FileNotFoundException()
+        }
+        return file
     }
 }
