@@ -16,14 +16,6 @@ import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
-// TODO: Check how to deserialize different shapes
-//@ShapeType(
-//    property = "type",
-//    subtypes = [
-//        ShapeSubtype(clazz = Circle::class, name = "CIRCLE"),
-//        ShapeSubtype(clazz = Rectangle::class, name = "RECTANGLE")
-//    ]
-//)
 open class Shape(
     @Transient open val type: String = "",
     @Transient open val points: List<PointF> = emptyList()
@@ -50,16 +42,6 @@ fun Shape.toCircleAnnotation(pageHeight: Int): Annotation {
     val points = points.map { it.convertCoordinatesFrom(pageHeight) }
     return Annotation(type = AnnotationType.CIRCLE.name, points = points)
 }
-
-// TODO: Check how to deserialize different shapes
-//@Retention(AnnotationRetention.RUNTIME)
-//@Target(AnnotationTarget.CLASS)
-//annotation class ShapeType(val property: String, val subtypes: Array<ShapeSubtype>)
-
-// TODO: Check how to deserialize different shapes
-//@Retention(AnnotationRetention.RUNTIME)
-//@Target(AnnotationTarget.CLASS)
-//annotation class ShapeSubtype(val clazz: KClass<out Shape>, val name: String)
 
 class ShapeDeserializer : JsonDeserializer<Shape> {
 

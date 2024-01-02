@@ -6,7 +6,6 @@ object PublicValue {
     const val DEFAULT_OCG_WIDTH = 35.0f
     const val DEFAULT_OCG_HEIGHT = 35.0f
 
-    const val KEY_REQUEST_PERMISSIONS = 10001
     const val KEY_REQUEST_FILE_PICKER = 10002
     const val DEFAULT_PAGE_NUMBER = 0
     const val KEY_REFERENCE_HASH = "ReferenceHash:"

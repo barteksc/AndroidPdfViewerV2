@@ -100,9 +100,7 @@ object AnnotationManager {
 
             rectAnnotation.apply {
                 setColor(Color.BLUE)
-                put(PdfName.OC, annotationLayer)
                 put(PdfName("relations"), relationsArray)
-
             }
 
             // add annotation into target page
@@ -175,7 +173,6 @@ object AnnotationManager {
             )
             circleAnnotation.apply {
                 setColor(Color.BLUE)
-                put(PdfName.OC, annotationLayer)
             }
 
             // add annotation into target page

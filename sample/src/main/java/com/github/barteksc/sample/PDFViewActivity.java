@@ -91,11 +91,9 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
 
     private Uri currUri = null;
 
-
     @OptionsItem(R.id.pickFile)
     void pickFile() {
-        int permissionCheck = ContextCompat.checkSelfPermission(this,
-                READ_EXTERNAL_STORAGE);
+        int permissionCheck = ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE);
 
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(
@@ -103,10 +101,8 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
                     new String[]{READ_EXTERNAL_STORAGE},
                     PERMISSION_CODE
             );
-
             return;
         }
-
         launchPicker();
     }
 
@@ -124,9 +120,7 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
-
         this.pdfView = findViewById(R.id.pdfView);
-
     }
 
     @AfterViews
@@ -134,7 +128,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         pdfView.setBackgroundColor(Color.LTGRAY);
         setTitle(pdfFileName);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -170,8 +163,6 @@ public class PDFViewActivity extends AppCompatActivity implements OnPageChangeLi
         // /storage/emulated/0/Download/PDF_ENGLISH.pdf
 
         pdfFileName = getFileName(currUri);
-
-        String currFilePath = UriUtils.getPathFromUri(this, currUri);
 
         this.configurator = pdfView.fromUri(currUri)
                 .defaultPage(PublicValue.DEFAULT_PAGE_NUMBER)

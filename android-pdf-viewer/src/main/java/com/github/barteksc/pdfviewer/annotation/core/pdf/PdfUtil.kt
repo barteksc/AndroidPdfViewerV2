@@ -90,8 +90,7 @@ object PdfUtil {
     }
 
     /** Uses the passed PDF file to create a PNG image from the first page,
-     *  maps the PDF annotations to shapes that will be saved as json string
-     *  */
+     *  maps the PDF annotations to shapes that will be saved as json string */
     @JvmStatic
     fun getPdfToImageResultData(
         pdfFilePath: String,
@@ -196,10 +195,6 @@ object PdfUtil {
 
                             }
                         }
-                        // why is it "RECTANGLE"
-                        // when creating
-                        // it was rect, but should it be square?
-
                         val squareAnnotation = Annotation(
                            AnnotationType.SQUARE.name,
                             squareAnnotationPoints,
@@ -248,9 +243,8 @@ object PdfUtil {
         // convert annotation to shape
         val shapes = pdfAnnotations.map { annotation ->
             when (annotation.type) {
-                // it was rect, but should it be square?
                 AnnotationType.SQUARE.name -> return@map annotation.toRectangleShape(pageHeight)
-                "CIRCLE" -> return@map annotation.toCircleShape(pageHeight)
+                AnnotationType.CIRCLE.name -> return@map annotation.toCircleShape(pageHeight)
                 else -> throw Exception("Annotation is not recognised")
             }
         }

@@ -31,12 +31,6 @@ import org.benjinus.pdfium.util.SizeF;
 
 import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MAXIMUM_ZOOM;
 import static com.github.barteksc.pdfviewer.util.Constants.Pinch.MINIMUM_ZOOM;
-
-/*
-import com.shockwave.pdfium.PdfDocument;
-import com.shockwave.pdfium.util.SizeF;
-*/
-
 /**
  * This Manager takes care of moving the PDFView,
  * set its zoom track user actions.
@@ -53,7 +47,6 @@ class DragPinchManager implements GestureDetector.OnGestureListener, GestureDete
     private boolean scaling = false;
 
     /** Enables scrolling and zooming */
-//    private boolean enabled = false;
     private boolean enabled = true;
 
     DragPinchManager(PDFView pdfView, AnimationManager animationManager) {

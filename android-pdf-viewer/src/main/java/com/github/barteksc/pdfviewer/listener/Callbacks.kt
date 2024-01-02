@@ -176,5 +176,4 @@ class Callbacks {
     fun callLinkHandler(event: LinkTapEvent?) {
         linkHandler?.handleLinkEvent(event)
     }
-    //todo:check if lateinit vars can be used
 }
